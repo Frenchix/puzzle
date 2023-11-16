@@ -20,24 +20,12 @@ const pieces = ref([]);
 //   // Ajoutez d'autres pièces ici...
 // ]);
 
-// function pieceStyle(piece) {
-//     return {
-//       left: piece.x + 'px',
-//       top: piece.y + 'px',
-//       width: piece.width + 'px',
-//       height: piece.height + 'px',
-//       backgroundImage: `url(${piece.image})`,
-//       backgroundSize: 'cover',
-//       position: 'absolute'
-//     };
-//   }
-
 const pieceStyle = (piece) => ({
     left: piece.x + 'px',
     top: piece.y + 'px',
     width: piece.width + 'px',
     height: piece.height + 'px',
-    backgroundImage: `url(${piece.image})`,
+    backgroundImage: `url(${piece.fileName})`,
     backgroundSize: 'cover',
     position: 'absolute'
 });
@@ -173,7 +161,7 @@ const isCloseEnough = (piece1, piece2) => {
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:5002/api/images');
+    const response = await fetch('http://localhost:5002/api/getPieces');
     const puzzleData = await response.json();
     pieces.value = puzzleData;
     pieces.value.forEach(piece => {

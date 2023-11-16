@@ -1,32 +1,8 @@
-const sharp = require('sharp');
+const PuzzlePiece = require('./model/puzzle');
+const { getMatchingType, getRandomType } = require('./services/randomFunction');
+const { applyMask } = require('./services/sharpFunction');
 
-baseImagePath = 'gragas2.jpeg';
-
-function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPiece) {
-    const outputImagePath = `./pieces_a_assembler/${nbPiece}.png`
-    sharp(baseImagePath)
-        .extract({ left: left, top: top, width: width, height: height })
-        .composite([{ input: maskImagePath, blend: 'dest-in' }])
-        .toFile(outputImagePath)
-        .then(() => console.log(`Puzzle piece created at ${outputImagePath}`))
-        .catch(err => console.error(err));
-}
-
-class PuzzlePiece {
-    constructor(top, right, bottom, left, row, col) {
-        this.top = top;
-        this.right = right;
-        this.bottom = bottom;
-        this.left = left;
-        this.row = row;
-        this.col = col;
-        this.fileName = this.imageName();
-    }
-
-    imageName(){
-        return `top-${this.top}_left-${this.left}_bot-${this.bottom}_right-${this.right}.png`;
-    }
-}
+baseImagePath = 'gragas.jpeg';
 
 function generatePuzzle(rows, cols) {
     let i = 0;
@@ -38,6 +14,7 @@ function generatePuzzle(rows, cols) {
         
         let rowPieces = [];
         for (let col = 0; col < cols; col++) {
+            const attachment = [];
             let width = 300;
             let height = 300;
             leftImage = 300 * col;
@@ -60,8 +37,35 @@ function generatePuzzle(rows, cols) {
             if (right === 'Plein'){
                 width = width + 74;
             }
-            const puzzlePiece = new PuzzlePiece(top, right, bottom, left, row, col);
+
+            // On crée les points d'accroche
+            if (top === 'Plein'){
+                attachment.push({ x: width / 2, y: 0, matchId: i - 7});
+            }
+            if (right === 'Plein'){
+                attachment.push({ x: width, y: height / 2, matchId: i + 1});
+            }
+            if (bottom === 'Plein'){
+                attachment.push({ x: width / 2, y: height, matchId: i + 7});
+            }
+            if (left === 'Plein'){
+                attachment.push({ x: 0, y: height / 2, matchId: i - 1});
+            }
+            if (top === 'Vide'){
+                attachment.push({ x: width / 2, y: 74, matchId: i - 7});
+            }
+            if (right === 'Vide'){
+                attachment.push({ x: width - 74, y: height / 2, matchId: i + 1});
+            }
+            if (bottom === 'Vide'){
+                attachment.push({ x: width / 2, y: height - 74, matchId: i + 7});
+            }
+            if (left === 'Vide'){
+                attachment.push({ x: 74, y: height / 2, matchId: i - 1});
+            }
+            const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment);
             maskImagePath = './pieces_ordre/' + puzzlePiece.fileName;
+            console.log(topImage);
             applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i);
             rowPieces.push(puzzlePiece);
             i++;
@@ -71,35 +75,6 @@ function generatePuzzle(rows, cols) {
     return puzzle;
 }
 
-function getRandomType() {
-    // Retourne un type aléatoire parmi Vide ou Plein
-    const type = ['Vide', 'Plein'];
-    return type[getRandomInt(type.length)];
-}
-
-function getMatchingType(type) {
-    // Retourne le type correspondant pour s'assurer que les pièces s'imbriquent correctement : Vide ou plein
-    if (type === 'Vide'){
-        return 'Plein';
-    } else {
-        return 'Vide';
-    }
-}
-// for (let i = 0; i < 49; i++){
-//     switch (i) {
-//         case 0 :
-//             const random = getRandomInt(4) + 1;
-//             maskImagePath = './pieces_ordre/' + random + '.png';
-//             applyMask(baseImagePath, maskImagePath, outputImagePath);
-            
-//     }
-// }
-// maskImagePath = './pieces_ordre/top-Plat_left-Plat_bot-Plein_right-Plein.png';
-// applyMask(baseImagePath, maskImagePath, outputImagePath);
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
 //1-4 haut gauche
 //5-12 haut
 //13-16 haut droit
@@ -112,4 +87,4 @@ function getRandomInt(max) {
 
 //2100*2100 7 pieces par cote
 
-generatePuzzle(7,7);
+console.log(generatePuzzle(7,7));
