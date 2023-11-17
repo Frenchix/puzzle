@@ -16,8 +16,8 @@ class PuzzlePiece {
         this.pieceName = this.pieceName();
         this.fileName = this.fileName();
         this.attachmentPoints = attachmentPoints;
-        this.x = getRandomInt(800);
-        this.y = getRandomInt(800);
+        this.x = getRandomInt(750);
+        this.y = getRandomInt(750);
         this.width = width;
         this.height = height;
         this.originalWidth = ORIGINAL_WIDTH;
@@ -76,49 +76,49 @@ class PuzzlePiece {
                     if (top === 'Plein'){
                         attachment.push({ x: width, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i + 1});
                     } else {
-                        attachment.push({ x: width, y: height / 2, matchId: i + 1});
+                        attachment.push({ x: width, y: ORIGINAL_HEIGHT / 2, matchId: i + 1});
                     }
                 }
                 if (bottom === 'Plein'){
                     if (left === 'Plein'){
                         attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: height, matchId: i + 7});
                     } else {
-                        attachment.push({ x: width / 2, y: height, matchId: i + 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height, matchId: i + 7});
                     }
                 }
                 if (left === 'Plein'){
                     if (top === 'Plein'){
                         attachment.push({ x: 0, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i - 1});
                     } else {
-                        attachment.push({ x: 0, y: height / 2, matchId: i - 1});
+                        attachment.push({ x: 0, y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
                 if (top === 'Vide'){
                     if (left === 'Plein'){
                         attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: 74, matchId: i - 7});
                     } else {
-                        attachment.push({ x: width / 2, y: 74, matchId: i - 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: 74, matchId: i - 7});
                     }
                 }
                 if (right === 'Vide'){
                     if (top === 'Plein'){
                         attachment.push({ x: width - 74, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i + 1});
                     } else {
-                        attachment.push({ x: width - 74, y: height / 2, matchId: i + 1});
+                        attachment.push({ x: width - 74, y: ORIGINAL_HEIGHT / 2, matchId: i + 1});
                     }
                 }
                 if (bottom === 'Vide'){
                     if (left === 'Plein'){
                         attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: height - 74, matchId: i + 7});
                     } else {
-                        attachment.push({ x: width / 2, y: height - 74, matchId: i + 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height - 74, matchId: i + 7});
                     }
                 }
                 if (left === 'Vide'){
                     if (top === 'Plein'){
                         attachment.push({ x: 74, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i - 1});
                     } else {
-                        attachment.push({ x: 74, y: height / 2, matchId: i - 1});
+                        attachment.push({ x: 74, y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
                 const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment, width, height);
