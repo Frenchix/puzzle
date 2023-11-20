@@ -2,15 +2,15 @@
 import backgroundImage from "@/assets/gragas2.jpeg";
 import { ref, reactive, onMounted } from 'vue';
 
-const DISTANCE_POINTS = 50; // Seuil de proximité en pixels
 const selectedPiece = ref(null);
 const puzzleImage = ref(null);
 const offset = reactive({ x: 0, y: 0 });
 
+const originalSize = 2100; // Taille originale de l'image
+const displayedWidth = ref(2100);
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
 
 const pieces = ref([]);
-const groups = ref([]);
 // const piece1 = new URL('../assets/pieces_a_assembler/0.png', import.meta.url).href;
 // const piece2 = new URL('../assets/pieces_a_assembler/1.png', import.meta.url).href;
 
@@ -34,7 +34,7 @@ const startDrag = (event, piece) => {
     const group = piece.groupId ? groups.value.find(g => g.id === piece.groupId) : null;
     
     if (group) {
-        console.log("ok")
+        console.log(group.pieces)
         // Définir l'état de déplacement pour le groupe entier
         group.isBeingDragged = true;
         // Calculez les offsets par rapport à la position de la souris
@@ -50,12 +50,10 @@ const startDrag = (event, piece) => {
     selectedPiece.value = piece;
     offset.x = event.clientX - piece.x;
     offset.y = event.clientY - piece.y;
-    console.log("x", event.clientX);
-    console.log('y', event.clientY);
-    console.log("pieceX", piece.x);
-    console.log("pieceY", piece.y);
-    console.log("OffsetX", offset.x);
-    console.log("OffsetY", offset.y);
+    // document.addEventListener('mousemove', onDrag);
+    // document.addEventListener('mouseup', () => {
+    //     endDrag(piece)
+    // });
 };
 
 const onDrag = (event) => {
@@ -72,27 +70,23 @@ const onDrag = (event) => {
     selectedPiece.value.y = event.clientY - offset.y;
 };
 
-const endDrag = (event) => {
+const endDrag = () => {
     if (!selectedPiece.value) return; // Ne rien faire si aucune pièce n'est sélectionnée
 
     groups.value.forEach(group => {
         group.isBeingDragged = false;
     });
-    checkForSnapping(selectedPiece.value, event);
-    // // document.removeEventListener('mousemove', onDrag);
-    // // document.removeEventListener('mouseup', endDrag);
+    checkForSnapping(selectedPiece.value);
+    // document.removeEventListener('mousemove', onDrag);
+    // document.removeEventListener('mouseup', endDrag);
     selectedPiece.value = null;
-    // console.log("groups", groups.value);
+    console.log("groups", groups.value);
 };
 
-const checkForSnapping = (movedPiece, event) => {
+const checkForSnapping = (movedPiece) => {
   pieces.value.forEach(piece => {
-    if(piece.groupId === movedPiece.groupId && piece.groupId !== undefined) {
-        return;
-    } else {
-        if (piece !== movedPiece && isCloseEnough(movedPiece, piece)) {
-            snapPieces(movedPiece, piece, event);
-        }
+    if (piece !== movedPiece && isCloseEnough(movedPiece, piece)) {
+      snapPieces(movedPiece, piece);
     }
   });
 };
@@ -127,8 +121,7 @@ const checkForSnapping = (movedPiece, event) => {
 
 
 
-const snapPieces = (movedPiece, stationaryPiece, event) => {
-    console.log("snap")
+const snapPieces = (movedPiece, stationaryPiece) => {
   const matchingPoints = movedPiece.attachmentPoints.find(point => point.matchId === stationaryPiece.id);
   if (!matchingPoints) return;
 
@@ -137,93 +130,56 @@ const snapPieces = (movedPiece, stationaryPiece, event) => {
 
   movedPiece.x = stationaryPiece.x + pointStationary.x - matchingPoints.x;
   movedPiece.y = stationaryPiece.y + pointStationary.y - matchingPoints.y;
-// console.log("eventX", event.clientX);
-// console.log("eventY", event.clientY);
-// console.log("stationX", stationaryPiece.x);
-// console.log("stationY", stationaryPiece.y);
-    // movedPiece.x = stationaryPiece.x + stationaryPiece.width;
-    // movedPiece.y = stationaryPiece.y;
   addToGroup(movedPiece, stationaryPiece);
 };
 
+const groups = ref([]);
+
 // Exemple de création d'un groupe
 const addToGroup = (pieceToAdd, targetPiece) => {
-    console.log(groups.value.l)
-    let newGroup = { id: groups.value.length > 0 ? parseInt([groups.value.length - 1], 10) + 1 : 0, pieces: [] };
+  let groupToAdd = pieceToAdd.groupId ? groups.value.find(g => g.id === pieceToAdd.groupId) : null;
+  let targetGroup = targetPiece.groupId ? groups.value.find(g => g.id === targetPiece.groupId) : null;
 
-    let groupToAdd = pieceToAdd.groupId ? groups.value.find(g => g.id === pieceToAdd.groupId) : null;
-    let targetGroup = targetPiece.groupId ? groups.value.find(g => g.id === targetPiece.groupId) : null;
-
-    if(groupToAdd) {
-        groupToAdd.pieces.forEach(p => {
-          newGroup.pieces.push(p);
-          p.groupId = newGroup.id;
+  if (groupToAdd && targetGroup) {
+    // Si les deux pièces appartiennent à des groupes différents, fusionnez-les
+    if (groupToAdd !== targetGroup) {
+      // Fusionner les pièces de groupToAdd dans targetGroup
+      groupToAdd.pieces.forEach(p => {
+        if (!targetGroup.pieces.includes(p)) {
+          targetGroup.pieces.push(p);
+          p.groupId = targetGroup.id;
+        }
       });
-    //   Supprimer l'ancien groupToAdd
+
+      // Supprimer l'ancien groupToAdd
       const indexToRemove = groups.value.indexOf(groupToAdd);
       if (indexToRemove !== -1) {
         groups.value.splice(indexToRemove, 1);
       }
-    } else {
-        pieceToAdd.groupId = newGroup.id;
-        newGroup.pieces.push(pieceToAdd);
     }
-
-    if(targetGroup) {
-        targetGroup.pieces.forEach(p => {
-          newGroup.pieces.push(p);
-          p.groupId = newGroup.id;
-      });
-      //   Supprimer l'ancien groupToAdd
-      const indexToRemove = groups.value.indexOf(targetGroup);
-      if (indexToRemove !== -1) {
-        groups.value.splice(indexToRemove, 1);
-      }
-    } else {
-        targetPiece.groupId = newGroup.id;
-        newGroup.pieces.push(targetPiece);
+  } else if (groupToAdd || targetGroup) {
+    // Si une des pièces est dans un groupe, ajoutez l'autre pièce à ce groupe
+    let existingGroup = groupToAdd || targetGroup;
+    if (!existingGroup.pieces.includes(pieceToAdd)) {
+      existingGroup.pieces.push(pieceToAdd);
+      pieceToAdd.groupId = existingGroup.id;
     }
-    console.log("newgroupe", newGroup)
+    if (!existingGroup.pieces.includes(targetPiece)) {
+      existingGroup.pieces.push(targetPiece);
+      targetPiece.groupId = existingGroup.id;
+    }
+  } else {
+    // Si aucune des pièces n'est dans un groupe, créez un nouveau groupe
+    let newGroup = { id: groups.value.length + 1, pieces: [pieceToAdd, targetPiece] };
+    pieceToAdd.groupId = newGroup.id;
+    targetPiece.groupId = newGroup.id;
     groups.value.push(newGroup);
-    console.log(groups.value);
-//   if (groupToAdd && targetGroup) {
-//     // Si les deux pièces appartiennent à des groupes différents, fusionnez-les
-//     if (groupToAdd !== targetGroup) {
-//       // Fusionner les pièces de groupToAdd dans targetGroup
-//       groupToAdd.pieces.forEach(p => {
-//         if (!targetGroup.pieces.includes(p)) {
-//           targetGroup.pieces.push(p);
-//           p.groupId = targetGroup.id;
-//         }
-//       });
-
-//       // Supprimer l'ancien groupToAdd
-//       const indexToRemove = groups.value.indexOf(groupToAdd);
-//       if (indexToRemove !== -1) {
-//         groups.value.splice(indexToRemove, 1);
-//       }
-//     }
-//   } else if (groupToAdd || targetGroup) {
-//     // Si une des pièces est dans un groupe, ajoutez l'autre pièce à ce groupe
-//     let existingGroup = groupToAdd || targetGroup;
-//     if (!existingGroup.pieces.includes(pieceToAdd)) {
-//       existingGroup.pieces.push(pieceToAdd);
-//       pieceToAdd.groupId = existingGroup.id;
-//     }
-//     if (!existingGroup.pieces.includes(targetPiece)) {
-//       existingGroup.pieces.push(targetPiece);
-//       targetPiece.groupId = existingGroup.id;
-//     }
-//   } else {
-//     // Si aucune des pièces n'est dans un groupe, créez un nouveau groupe
-//     let newGroup = { id: groups.value.length + 1, pieces: [pieceToAdd, targetPiece] };
-//     pieceToAdd.groupId = newGroup.id;
-//     targetPiece.groupId = newGroup.id;
-//     groups.value.push(newGroup);
-//   }
-//   console.log(groups.value)
+  }
+  console.log(groups.value)
 };
 
+
+const DISTANCE_POINTS = 50; // Seuil de proximité en pixels
 
 const isCloseEnough = (piece1, piece2) => {
   return piece1.attachmentPoints.some(point1 => {
@@ -284,6 +240,13 @@ onMounted(async () => {
 
 </script>
 
+<!-- <template>
+    <div class="h-full">
+        <div class="bg-cover h-full bg-[url('../assets/gragas2.jpeg')]">
+
+        </div>
+    </div>
+</template> -->
 <template>
     <img class="puzzle-background" :src="backgroundImage" alt="Puzzle Background" ref="puzzleImage" @load="onImageLoad"/>
     <div class="puzzle-container">
@@ -302,9 +265,9 @@ onMounted(async () => {
 <style>
 .puzzle-container {
   position: relative;
-  /* width: 800px; ou la largeur souhaitée */
+  width: 800px; /* ou la largeur souhaitée */
   height: 800px; /* ou la hauteur souhaitée */
-  border: 0px solid;
+  border: 2px solid;
 }
 
 .puzzle-background {
