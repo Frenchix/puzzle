@@ -74,11 +74,20 @@ const onDrag = (event) => {
 
 const endDrag = (event) => {
     if (!selectedPiece.value) return; // Ne rien faire si aucune pièce n'est sélectionnée
-
+    let groupToSnap = null;
     groups.value.forEach(group => {
+        if(group.isBeingDragged){
+            groupToSnap = group;
+        }
         group.isBeingDragged = false;
     });
-    checkForSnapping(selectedPiece.value, event);
+    if(groupToSnap){
+        groupToSnap.pieces.forEach(piece => {
+            checkForSnapping(piece, event);
+        })
+    } else {
+        checkForSnapping(selectedPiece.value, event);
+    }
     // // document.removeEventListener('mousemove', onDrag);
     // // document.removeEventListener('mouseup', endDrag);
     selectedPiece.value = null;
@@ -135,8 +144,26 @@ const snapPieces = (movedPiece, stationaryPiece, event) => {
   const pointStationary = stationaryPiece.attachmentPoints.find(point => point.matchId === movedPiece.id);
   if (!pointStationary) return;
 
-  movedPiece.x = stationaryPiece.x + pointStationary.x - matchingPoints.x;
-  movedPiece.y = stationaryPiece.y + pointStationary.y - matchingPoints.y;
+//   movedPiece.x = stationaryPiece.x + pointStationary.x - matchingPoints.x;
+//   movedPiece.y = stationaryPiece.y + pointStationary.y - matchingPoints.y;
+   // Calculez le décalage
+  const offsetX = stationaryPiece.x + pointStationary.x - matchingPoints.x - movedPiece.x;
+  const offsetY = stationaryPiece.y + pointStationary.y - matchingPoints.y - movedPiece.y;
+  console.log("offsetXX", movedPiece.x)
+        console.log("offseYY", offsetY)
+//   // Obtenez le groupe ou créez-en un si nécessaire
+  let group = movedPiece.groupId ? groups.value.find(g => g.id === movedPiece.groupId) : undefined;
+  
+//   // Ajustez les positions de toutes les pièces dans le groupe
+if (group){
+    group.pieces.forEach(piece => {
+    piece.x += offsetX;
+    piece.y += offsetY;
+  });
+} else {
+    movedPiece.x = stationaryPiece.x + pointStationary.x - matchingPoints.x;
+    movedPiece.y = stationaryPiece.y + pointStationary.y - matchingPoints.y;
+}
 // console.log("eventX", event.clientX);
 // console.log("eventY", event.clientY);
 // console.log("stationX", stationaryPiece.x);
@@ -148,8 +175,8 @@ const snapPieces = (movedPiece, stationaryPiece, event) => {
 
 // Exemple de création d'un groupe
 const addToGroup = (pieceToAdd, targetPiece) => {
-    console.log(groups.value.l)
-    let newGroup = { id: groups.value.length > 0 ? parseInt([groups.value.length - 1], 10) + 1 : 0, pieces: [] };
+    console.log(groups.value.length)
+    let newGroup = { id: groups.value.length > 0 ? groups.value[groups.value.length - 1].id + 1 : 1, pieces: [] };
 
     let groupToAdd = pieceToAdd.groupId ? groups.value.find(g => g.id === pieceToAdd.groupId) : null;
     let targetGroup = targetPiece.groupId ? groups.value.find(g => g.id === targetPiece.groupId) : null;
