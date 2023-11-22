@@ -1,9 +1,6 @@
 const { getMatchingType, getRandomType, getRandomInt } = require('../services/randomFunction');
 const { applyMask } = require('../services/sharpFunction');
 
-const ORIGINAL_WIDTH = 300;
-const ORIGINAL_HEIGHT = 300;
-
 class PuzzlePiece {
     constructor(id, top, right, bottom, left, row, col, attachmentPoints, width, height) {
         this.id = id;
@@ -16,12 +13,12 @@ class PuzzlePiece {
         this.pieceName = this.pieceName();
         this.fileName = this.fileName();
         this.attachmentPoints = attachmentPoints;
-        this.x = getRandomInt(750);
-        this.y = getRandomInt(750);
+        this.x = getRandomInt(600);
+        this.y = getRandomInt(600);
         this.width = width;
         this.height = height;
-        this.originalWidth = ORIGINAL_WIDTH;
-        this.originalHeight = ORIGINAL_HEIGHT;
+        // this.originalWidth = ORIGINAL_WIDTH;
+        // this.originalHeight = ORIGINAL_HEIGHT;
     }
 
     pieceName(){
@@ -32,7 +29,10 @@ class PuzzlePiece {
     }
     
     static generatePuzzle(rows, cols){
+        const ORIGINAL_WIDTH = 2100 / rows;
+        const ORIGINAL_HEIGHT = 2100 / cols;
         const baseImagePath = './gragas.jpeg';
+
         let i = 0;
         let puzzle = [];
         let topImage = 0;
@@ -51,79 +51,81 @@ class PuzzlePiece {
                 let bottom = row === rows - 1 ? 'Plat' : getRandomType();
 
                 if (top === 'Plein') {
-                    topImage = topImage - 74;
-                    height = height + 74;
+                    topImage = topImage - Math.round(ORIGINAL_WIDTH / 4.05);
+                    height = height + Math.round(ORIGINAL_WIDTH / 4.05);
                 }
                 if (bottom === 'Plein'){
-                    height = height + 74;
+                    height = height + Math.round(ORIGINAL_WIDTH / 4.05);
                 }
                 if (left === 'Plein'){
-                    leftImage = leftImage - 74;
-                    width = width + 74;
+                    leftImage = leftImage - Math.round(ORIGINAL_WIDTH / 4.05);
+                    width = width + Math.round(ORIGINAL_WIDTH / 4.05);
                 }
                 if (right === 'Plein'){
-                    width = width + 74;
+                    width = width + Math.round(ORIGINAL_WIDTH / 4.05);
                 }
                 // On crée les points d'accroche
                 if (top === 'Plein'){
                     if (left === 'Plein'){
-                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: 0, matchId: i - 7});
+                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + Math.round(ORIGINAL_WIDTH / 4.05), y: 0, matchId: i - rows});
                     } else {
-                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: 0, matchId: i - 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: 0, matchId: i - rows});
                     }
                 }
                 if (right === 'Plein'){
                     if (top === 'Plein'){
-                        attachment.push({ x: width, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i + 1});
+                        attachment.push({ x: width, y: (ORIGINAL_HEIGHT / 2) + Math.round(ORIGINAL_WIDTH / 4.05), matchId: i + 1});
                     } else {
                         attachment.push({ x: width, y: ORIGINAL_HEIGHT / 2, matchId: i + 1});
                     }
                 }
                 if (bottom === 'Plein'){
                     if (left === 'Plein'){
-                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: height, matchId: i + 7});
+                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + Math.round(ORIGINAL_WIDTH / 4.05), y: height, matchId: i + rows});
                     } else {
-                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height, matchId: i + 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height, matchId: i + rows});
                     }
                 }
                 if (left === 'Plein'){
                     if (top === 'Plein'){
-                        attachment.push({ x: 0, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i - 1});
+                        attachment.push({ x: 0, y: (ORIGINAL_HEIGHT / 2) + Math.round(ORIGINAL_WIDTH / 4.05), matchId: i - 1});
                     } else {
                         attachment.push({ x: 0, y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
                 if (top === 'Vide'){
                     if (left === 'Plein'){
-                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: 74, matchId: i - 7});
+                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + Math.round(ORIGINAL_WIDTH / 4.05), y: Math.round(ORIGINAL_WIDTH / 4.05), matchId: i - rows});
                     } else {
-                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: 74, matchId: i - 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: Math.round(ORIGINAL_WIDTH / 4.05), matchId: i - rows});
                     }
                 }
                 if (right === 'Vide'){
                     if (top === 'Plein'){
-                        attachment.push({ x: width - 74, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i + 1});
+                        attachment.push({ x: width - Math.round(ORIGINAL_WIDTH / 4.05), y: (ORIGINAL_HEIGHT / 2) + Math.round(ORIGINAL_WIDTH / 4.05), matchId: i + 1});
                     } else {
-                        attachment.push({ x: width - 74, y: ORIGINAL_HEIGHT / 2, matchId: i + 1});
+                        attachment.push({ x: width - Math.round(ORIGINAL_WIDTH / 4.05), y: ORIGINAL_HEIGHT / 2, matchId: i + 1});
                     }
                 }
                 if (bottom === 'Vide'){
                     if (left === 'Plein'){
-                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + 74, y: height - 74, matchId: i + 7});
+                        attachment.push({ x: (ORIGINAL_WIDTH / 2) + Math.round(ORIGINAL_WIDTH / 4.05), y: height - Math.round(ORIGINAL_WIDTH / 4.05), matchId: i + rows});
                     } else {
-                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height - 74, matchId: i + 7});
+                        attachment.push({ x: ORIGINAL_WIDTH / 2, y: height - Math.round(ORIGINAL_WIDTH / 4.05), matchId: i + rows});
                     }
                 }
                 if (left === 'Vide'){
                     if (top === 'Plein'){
-                        attachment.push({ x: 74, y: (ORIGINAL_HEIGHT / 2) + 74, matchId: i - 1});
+                        attachment.push({ x: Math.round(ORIGINAL_WIDTH / 4.05), y: (ORIGINAL_HEIGHT / 2) + Math.round(ORIGINAL_WIDTH / 4.05), matchId: i - 1});
                     } else {
-                        attachment.push({ x: 74, y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
+                        attachment.push({ x: Math.round(ORIGINAL_WIDTH / 4.05), y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
+
                 const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment, width, height);
                 const maskImagePath = './pieces_ordre/' + puzzlePiece.pieceName;
-                applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i);
+
+                applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i, ORIGINAL_WIDTH);
                 rowPieces.push(puzzlePiece);
                 i++;
             }
