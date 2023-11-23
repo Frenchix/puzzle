@@ -1,15 +1,43 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
+
+const images = ref([]);
+const numberOfPieces = ref('');
+const selectedImageId = ref(null);
+const pieceOptions = ref([49, 100, 225, 400]); // Options pour le nombre de pièces
+
+function selectImage(image) {
+  selectedImageId.value = image.id;
+}
+
+function startGame() {
+    if (selectedImageId.value && numberOfPieces.value) {
+    router.push({
+      path: '/game',
+      query: { imageId: selectedImageId.value, pieces: numberOfPieces.value }
+    });
+  }
+}
+
+onMounted(async () => {
+    try {
+        const response = await fetch('http://localhost:5002/api/getImages');
+        images.value = await response.json();
+    } catch (error) {
+        console.error('Erreur lors du chargement des images', error);
+    }
+})
+</script>
+
 <template>
     <div class="home-container">
       <div class="image-selection">
-        <div v-for="image in preexistingImages" :key="image.id" class="image-card">
-          <img :src="image.src" @click="selectImage(image)" />
+        <div v-for="image in images" :key="image.id" class="image-card">
+          <img :src="image.src" @click="selectImage(image)" :class="{ 'selected-image': selectedImageId === image.id }"/>
         </div>
-      </div>
-  
-      <div class="image-generation">
-        <input v-model="imageDescription" placeholder="Description pour l'IA" />
-        <button @click="generateImage">Générer Image</button>
-        <img v-if="generatedImage" :src="generatedImage" />
       </div>
   
       <div class="puzzle-options">
@@ -21,31 +49,6 @@
       </div>
     </div>
   </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  
-  const preexistingImages = ref([{ id: 1, src: 'path_to_image_1.jpg' }, /* ... autres images ... */]);
-  const imageDescription = ref('');
-  const generatedImage = ref(null);
-  const numberOfPieces = ref('');
-  const pieceOptions = ref([100, 200, 300]); // Options pour le nombre de pièces
-  
-  function selectImage(image) {
-    // Sélectionner une image préexistante
-    // ...
-  }
-  
-  function generateImage() {
-    // Logique pour générer une image avec l'IA basée sur `imageDescription.value`
-    // ...
-  }
-  
-  function startGame() {
-    // Lancer le jeu avec l'image et le nombre de pièces sélectionnés
-    // ...
-  }
-  </script>
   
   <style>
   .home-container {
@@ -89,6 +92,9 @@
   
   button {
     background-color: #007bff;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 4px;
     color: white;
     border: none;
     cursor: pointer;
@@ -99,15 +105,13 @@
     background-color: #0056b3;
   }
   
-  input {
-    border: 2px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  
-  input:focus {
-    border-color: #007bff;
-  }
+  .selected-image {
+  border: 3px solid #007bff; /* ou tout autre style distinctif */
+  transform: scale(1.1);
+  transition: transform 0.3s ease, border 0.3s ease;
+  box-shadow: 0 0 10px 3px rgba(0, 123, 255, 0.5); /* exemple d'ombre */
+}
+
   </style>
   
   

@@ -1,5 +1,6 @@
 const { getMatchingType, getRandomType, getRandomInt } = require('../services/randomFunction');
 const { applyMask } = require('../services/sharpFunction');
+const { images } = require('../model/images');
 
 class PuzzlePiece {
     constructor(id, top, right, bottom, left, row, col, attachmentPoints, width, height) {
@@ -28,10 +29,15 @@ class PuzzlePiece {
         return `http://localhost:5002/pieces_a_assembler/${this.id}.png`;
     }
     
-    static generatePuzzle(rows, cols){
+    static generatePuzzle(idToShow, nbPieces){
+        const rows = Math.sqrt(nbPieces);
+        const cols = Math.sqrt(nbPieces);
         const ORIGINAL_WIDTH = 2100 / rows;
         const ORIGINAL_HEIGHT = 2100 / cols;
-        const baseImagePath = './gragas.jpeg';
+        
+        const image = images.find(({ id }) => idToShow == id);
+        console.log(idToShow)
+        const baseImagePath = image.srcLocal;
 
         let i = 0;
         let puzzle = [];

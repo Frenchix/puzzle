@@ -1,6 +1,5 @@
 <script setup>
 import GameInterface from '../components/GameInterface.vue';
-import LaunchGame from '../components/LaunchGame.vue';
 import Header from '../components/Header.vue';
 
 </script>
@@ -9,7 +8,7 @@ import Header from '../components/Header.vue';
     <header>
         <Header/>
     </header>
-    <LaunchGame></LaunchGame>
+    <GameInterface></GameInterface>
 </template>
 
 

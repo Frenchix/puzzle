@@ -1,13 +1,29 @@
 <script setup>
 import backgroundImage from "@/assets/gragas2.jpeg";
 import { ref, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router'
+
+const route = useRoute();
+
+let timer = null;
+const gameTime = ref(0);
+
+const showCompletionAnimation = ref(false);
+
+const isImageModalOpen = ref(false);
+
+const imageId = ref(null);
+const nbPieces = ref(null);
+const isLoading = ref(true);
+const hasError = ref(false);
+const errorMessage = ref('');
 
 const DISTANCE_POINTS = 50; // Seuil de proximité en pixels
 const selectedPiece = ref(null);
 const puzzleImage = ref(null);
 const offset = reactive({ x: 0, y: 0 });
 
-const scaleFactor = ref(0.2); // Facteur d'échelle initial
+const scaleFactor = ref(0.3); // Facteur d'échelle initial
 
 const pieces = ref([]);
 const groups = ref([]);
@@ -23,6 +39,7 @@ const pieceStyle = (piece) => ({
 });
 
 const startDrag = (event, piece) => {
+    startTimer();
     const group = piece.groupId ? groups.value.find(g => g.id === piece.groupId) : null;
     
     if (group) {
@@ -151,8 +168,12 @@ const addToGroup = (pieceToAdd, targetPiece) => {
         newGroup.pieces.push(targetPiece);
     }
     groups.value.push(newGroup);
+    console.log(groups)
+    if(groups.value[0].pieces.length == nbPieces.value){
+        stopTimer();
+        triggerCompletionAnimation();
+    }
 };
-
 
 const isCloseEnough = (piece1, piece2) => {
   return piece1.attachmentPoints.some(point1 => {
@@ -169,6 +190,57 @@ const isCloseEnough = (piece1, piece2) => {
   });
 };
 
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Échec du chargement de l'image : ${src}`));
+    img.src = src;
+  });
+}
+
+async function restartGame() {
+    location.reload() 
+}
+
+function startTimer() {
+  if (!timer) {
+    timer = setInterval(() => {
+      gameTime.value++;
+    }, 1000);
+  }
+}
+
+function stopTimer() {
+  if (timer) {
+    clearInterval(timer);
+    // timer = null;
+  }
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function enlargeImage() {
+  isImageModalOpen.value = true;
+}
+
+function closeImageModal() {
+  isImageModalOpen.value = false;
+}
+
+function triggerCompletionAnimation() {
+  showCompletionAnimation.value = true;
+
+  // Optionnel : Masquer l'animation après un certain temps
+  setTimeout(() => {
+    showCompletionAnimation.value = false;
+  }, 3000); // 3 secondes pour l'affichage de l'animation
+}
+
 onMounted(async () => {
     //7*7 = 49 pieces
     // 10*10 = 100 pieces
@@ -176,8 +248,15 @@ onMounted(async () => {
     // 20*20 = 400 pieces
 
   try {
-    const response = await fetch('http://localhost:5002/api/getPieces');
+    imageId.value = route.query.imageId;
+    nbPieces.value = route.query.pieces;
+    const responseImage = await fetch(`http://localhost:5002/api/getImage/${imageId.value}`);
+    const image = await responseImage.json();
+    puzzleImage.value = image.src;
+    const response = await fetch(`http://localhost:5002/api/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`);
     const puzzleData = await response.json();
+    const loadImagePromises = puzzleData.map(piece => loadImage(piece.fileName));
+    await Promise.all(loadImagePromises);
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
     pieces.value = puzzleData;
@@ -189,7 +268,11 @@ onMounted(async () => {
             attachmentPoint.y *= scaleFactor.value;
         });
     });
+    isLoading.value = false;
   } catch (error) {
+    hasError.value = true;
+    errorMessage.value = "Erreur lors du chargement des pièces.";
+    isLoading.value = false;
     console.error('Erreur lors du chargement des données du puzzle:', error);
   }
 });
@@ -197,29 +280,51 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="game-container">
-      <div class="puzzle-area">
-        <div class="puzzle-pieces">
-            <div v-for="piece in pieces" 
-                :key="piece.id" 
-                class="puzzle-piece" 
-                :style="pieceStyle(piece)"
-                @mousedown="event => startDrag(event, piece)">
+    <!-- Loading -->
+    <div v-if="isLoading" class="loading-indicator">Chargement...</div>
+    <!-- Message d'erreur -->
+    <div v-if="hasError" class="error-message">{{ errorMessage }}</div>
+
+    <div v-if="!isLoading && !hasError" class="game-container">
+        <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
+        <button class="button" @click="restartGame">Recommencer</button>
+
+        <div class="puzzle-preview" @click="enlargeImage">
+            <img :src="puzzleImage" alt="Aperçu du puzzle" />
+        </div>
+        <div v-if="isImageModalOpen" class="image-modal" @click="closeImageModal">
+            <div class="image-modal-content" @click.stop>
+                <img :src="puzzleImage" alt="Agrandissement du puzzle" />
+                <button class="button close-modal" @click="closeImageModal">Fermer</button>
             </div>
         </div>
-      </div>
-      <!-- <div class="puzzle-container"> -->
+        <div class="puzzle-area">
+            <div class="puzzle-pieces">
+                <div v-for="piece in pieces" 
+                    :key="piece.id" 
+                    class="puzzle-piece" 
+                    :style="pieceStyle(piece)"
+                    @mousedown="event => startDrag(event, piece)">
+                </div>
+            </div>
+        </div>
+        <div v-if="showCompletionAnimation" class="completion-animation">
+            Félicitations ! Puzzle terminé !
+        </div>
     </div>
-    <!-- </div> -->
   </template>
 
 <style>
-.puzzle-container {
-  position: relative;
-  background-color:beige;
-  width: 900px;
-  height: 700px;
-  border: 0px solid;
+.loading-indicator {
+  text-align: center;
+  font-size: 18px;
+  color: #007bff;
+}
+
+.error-message {
+  text-align: center;
+  font-size: 18px;
+  color: red;
 }
 
 .puzzle-background {
@@ -243,14 +348,7 @@ onMounted(async () => {
   position: absolute;
   cursor: move; /* Style du curseur pour le déplacement */
 }
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f5f5f5;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+
 
 .game-container {
   max-width: 1000px;
@@ -260,9 +358,91 @@ onMounted(async () => {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.timer {
+  font-size: 20px;
+  margin: 10px;
+}
+
+
+
 .puzzle-area {
   width: 100%;
   height: 700px; /* Ajustez selon les besoins de votre jeu */
   position: relative;
+}
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.image-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.image-modal-content img {
+  max-width: 90vw;
+  max-height: 80vh;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.puzzle-preview {
+    max-width: 100px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.puzzle-preview img {
+  max-width: 100px;
+  border-radius: 5px;
+}
+.completion-animation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #007bff;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 24px;
+  animation: fadeInOut 3s;
+  z-index: 10;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
 }
 </style>

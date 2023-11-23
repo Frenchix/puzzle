@@ -11,6 +11,7 @@ const port = process.env.PORT || 5002
 app.use(cors());
 app.use('/api', router);
 app.use('/pieces_a_assembler', express.static(path.join(__dirname, 'pieces_a_assembler')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 if(process.env.NODE_ENV !== 'development') {
     app.use(express.static('public/dist'));
     app.use(express.json());
