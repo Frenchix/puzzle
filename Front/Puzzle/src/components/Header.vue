@@ -1,4 +1,5 @@
 <script setup>
+import logo from "@/assets/logo.png";
 import { ref } from 'vue';
 
 const userName = ref('NomUtilisateur');
@@ -6,7 +7,7 @@ const userName = ref('NomUtilisateur');
 
 <template>
     <div class="game-header">
-        <img src="path_to_logo.png" alt="Logo" class="logo"/>
+        <img :src="logo" alt="Logo" class="logo"/>
         <span class="user-name">{{ userName }}</span>
     </div>
 </template>
@@ -14,7 +15,7 @@ const userName = ref('NomUtilisateur');
 <style>
 
 .logo {
-  height: 50px; /* Ajustez selon la taille de votre logo */
+  height: 80px; /* Ajustez selon la taille de votre logo */
 }
 
 .user-name {
@@ -27,7 +28,7 @@ const userName = ref('NomUtilisateur');
   justify-content: space-between;
   align-items: center;
   background-color: #f5f5f5;
-  padding: 10px 20px;
+  padding: 0px 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 

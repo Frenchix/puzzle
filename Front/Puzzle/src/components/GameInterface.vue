@@ -286,11 +286,12 @@ onMounted(async () => {
     <div v-if="hasError" class="error-message">{{ errorMessage }}</div>
 
     <div v-if="!isLoading && !hasError" class="game-container">
-        <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
-        <button class="button" @click="restartGame">Recommencer</button>
-
-        <div class="puzzle-preview" @click="enlargeImage">
-            <img :src="puzzleImage" alt="Aperçu du puzzle" />
+        <div class="w-full flex justify-around">
+            <button class="button h-fit" @click="restartGame">Recommencer</button>
+            <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
+            <div class="puzzle-preview" @click="enlargeImage">
+                <img :src="puzzleImage" alt="Aperçu du puzzle" />
+            </div>
         </div>
         <div v-if="isImageModalOpen" class="image-modal" @click="closeImageModal">
             <div class="image-modal-content" @click.stop>
