@@ -1,14 +1,28 @@
 <script setup>
 import logo from "@/assets/logo.png";
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useUserStore } from '../store/user'
+import { useRouter } from 'vue-router'
 
+const router = useRouter();
+
+const store = useUserStore();
+const { logout } = store;
+
+onMounted(() => {
+console.log(store.userName);    
+})
 const userName = ref('NomUtilisateur');
 </script>
 
 <template>
     <div class="game-header">
         <img :src="logo" alt="Logo" class="logo"/>
-        <span class="user-name">{{ userName }}</span>
+        <div>
+            <span class="user-name">{{ store.userName }}</span>
+            <button v-if="store.username" @click="logout()">Logout</button>
+            <button @click="router.replace('/login')">Login</button>
+        </div>
     </div>
 </template>
 
