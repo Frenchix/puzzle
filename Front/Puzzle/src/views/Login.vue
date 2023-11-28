@@ -45,7 +45,7 @@
                     </div>
                     <hr class="mt-6 border-b-1 border-gray-400" />
                   </div>
-                  <!-- <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+                  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
                     <div class="text-gray-500 text-center mb-3 font-bold">
                       <small>Ou se connecter avec Email/Mot de passe</small>
                     </div>
@@ -91,8 +91,8 @@
                           Une erreur est survenue!  
                       </div>
                     </form>
-                  </div> -->
-                  <!-- <div class="flex justify-around mb-3">
+                  </div>
+                  <div class="flex justify-around mb-3">
                     <div>
                         <a href="/resetPassword" class="text-gray-700"
                         ><small>Mot de passe oublié?</small></a
@@ -103,7 +103,7 @@
                         ><small> Créer un compte</small></a
                         >
                     </div>
-                  </div> -->
+                  </div>
                 </div>
               </div>
             </div>
@@ -114,23 +114,23 @@
   </template>
 
 <script setup>
-import { signInWithGoogle } from '../models/user';
+import { signIn, signInWithGoogle } from '../models/user';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// const email = ref()
-// const password = ref()
+const email = ref()
+const password = ref()
 const showError = ref(false)
-// async function signin() {
-//     try {
-//         await signIn(email.value, password.value)
-//         router.replace('/');
-//     } catch (error) {
-//         showError.value = true;
-//     }
-// }
+async function signin() {
+    try {
+        await signIn(email.value, password.value)
+        router.replace('/');
+    } catch (error) {
+        showError.value = true;
+    }
+}
 
 async function signInGoogle(){
     try {
