@@ -1,10 +1,12 @@
 import { ref, reactive } from 'vue';
 import { useTimer } from '../composable/useTimer';
+import { useUserStore } from '@/store/user';
+import { storeToRefs } from 'pinia';
 
 const { gameTime, startTimer, stopTimer } = useTimer();
 const showCompletionAnimation = ref(false);
 
-export function usePuzzlePieces(nbPieces) {
+export function usePuzzlePieces(id, nbPieces) {
     const pieces = ref([]);
     const groups = ref([]);
     const DISTANCE_POINTS = 50; // Seuil de proximité en pixels
@@ -141,10 +143,20 @@ export function usePuzzlePieces(nbPieces) {
             newGroup.pieces.push(targetPiece);
         }
         groups.value.push(newGroup);
-        console.log(groups)
+        // console.log(groups)
         if(groups.value[0].pieces.length == nbPieces.value){
+            const store = useUserStore();
+            const { userName, bestScore } = storeToRefs(store);
             stopTimer();
             triggerCompletionAnimation();
+            if (userName.value){
+                console.log("bestscore", bestScore.value)
+                console.log("gametime", gameTime.value);
+                if (bestScore.value === 0 || gameTime.value < bestScore.value){
+                    console.log("addScore");
+                    addScore(userName.value);
+                }
+            }
         }
     };
     
@@ -172,6 +184,17 @@ export function usePuzzlePieces(nbPieces) {
         }, 3000); // 3 secondes pour l'affichage de l'animation
       }
       
+    async function addScore(userName) {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: id.value,
+                                    nbPieces: nbPieces.value,
+                                    userName: userName,
+                                    time: gameTime.value})
+        };
+        await fetch("http://localhost:5002/api/addScore", requestOptions);
+    }
 
     return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag };
 }

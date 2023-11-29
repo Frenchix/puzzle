@@ -13,5 +13,7 @@ router.get('/getImages', imageController.getImages);
 router.get('/getImage/:id', imageController.getImageById);
 router.get('/getClassement/:id/:pieces', classementController.getClassementByIdAndPieces);
 router.get('/getClassement', classementController.getClassement);
+router.post('/addScore', classementController.addScore);
+router.get('/getBestScore/:id/:pieces/:userName', classementController.getBestScore);
 
 module.exports = router;

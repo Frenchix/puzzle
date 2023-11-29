@@ -14,7 +14,9 @@ function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPie
                 .extract({ left: left, top: top, width: width, height: height })
                 .composite([{ input: data, blend: 'dest-in' }])
                 .toFile(outputImagePath)
-                .then(() => console.log(`Puzzle piece created at ${outputImagePath}`))
+                .then(() => {
+                    // console.log(`Puzzle piece created at ${outputImagePath}`)
+                })
                 .catch(err => console.error(err));
         });
     

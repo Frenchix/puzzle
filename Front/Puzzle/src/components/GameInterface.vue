@@ -4,6 +4,9 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
 import { usePuzzlePieces } from '../composable/usePuzzlePieces';
 import ClassementPuzzle from "./ClassementPuzzle.vue";
+import { useTimer } from '../composable/useTimer';
+
+const { formatTime } = useTimer();
 
 const route = useRoute();
 
@@ -18,7 +21,7 @@ const errorMessage = ref('');
 const puzzleImage = ref(null);
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
-const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag } = usePuzzlePieces(nbPieces);
+const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag } = usePuzzlePieces(imageId, nbPieces);
 
 const pieceStyle = (piece) => ({
     left: piece.x + 'px',
@@ -43,12 +46,6 @@ async function restartGame() {
     location.reload() 
 }
 
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
-
 function enlargeImage() {
   isImageModalOpen.value = true;
 }
@@ -64,8 +61,8 @@ onMounted(async () => {
     // 20*20 = 400 pieces
 
   try {
-    imageId.value = route.query.imageId;
-    nbPieces.value = route.query.pieces;
+    imageId.value = parseInt(route.query.imageId, 10);
+    nbPieces.value = parseInt(route.query.pieces, 10);
     const responseImage = await fetch(`http://localhost:5002/api/getImage/${imageId.value}`);
     const image = await responseImage.json();
     puzzleImage.value = image.src;
@@ -102,7 +99,9 @@ onMounted(async () => {
     <div v-if="hasError" class="text-center text-lg text-red-500">{{ errorMessage }}</div>
 
     <div class="w-full flex flex-col-reverse lg:flex-row">
-        <ClassementPuzzle :id="imageId" :pieces="nbPieces"/>
+        <div v-if="imageId && nbPieces" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
+            <ClassementPuzzle :id="imageId" :pieces="nbPieces"/>
+        </div>
         <div v-if="!isLoading && !hasError" class="game-container w-10/12 min-w-[900px] m-auto">
             <div class="w-full flex justify-around">
                 <button class="button h-fit" @click="restartGame">Recommencer</button>

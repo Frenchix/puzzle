@@ -1,12 +1,14 @@
 <script setup>
 import logo from "@/assets/logo.png";
 import DropdownMenu from './DropdownMenu.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 </script>
 
 <template>
     <div class="game-header">
-        <img :src="logo" alt="Logo" class="logo"/>
+        <img :src="logo" alt="Logo" class="logo" @click="router.replace('/')"/>
         <DropdownMenu />
     </div>
 </template>

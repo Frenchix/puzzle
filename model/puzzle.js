@@ -36,7 +36,7 @@ class PuzzlePiece {
         const ORIGINAL_HEIGHT = 2100 / cols;
         
         const image = images.find(({ id }) => idToShow == id);
-        console.log(idToShow)
+        // console.log(idToShow)
         const baseImagePath = image.srcLocal;
 
         let i = 0;

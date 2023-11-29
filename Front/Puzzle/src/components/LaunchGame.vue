@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
+import ClassementPuzzle from "./ClassementPuzzle.vue";
 
 const router = useRouter();
 
@@ -17,7 +18,7 @@ function startGame() {
     if (selectedImageId.value && numberOfPieces.value) {
     router.push({
       path: '/game',
-      query: { imageId: selectedImageId.value, pieces: numberOfPieces.value }
+      query: { imageId: selectedImageId.value, pieces: numberOfPieces.value },
     });
   }
 }
@@ -34,19 +35,22 @@ onMounted(async () => {
 
 <template>
     <div class="home-container">
-      <div class="image-selection">
-        <div v-for="image in images" :key="image.id" class="image-card">
-          <img :src="image.src" @click="selectImage(image)" :class="{ 'selected-image': selectedImageId === image.id }"/>
+        <div class="image-selection">
+            <div v-for="image in images" :key="image.id" class="image-card">
+            <img :src="image.src" @click="selectImage(image)" :class="{ 'selected-image': selectedImageId === image.id }"/>
+            </div>
         </div>
-      </div>
-  
-      <div class="puzzle-options">
-        <select v-model="numberOfPieces">
-          <option disabled value="">Nombre de pièces</option>
-          <option v-for="number in pieceOptions" :key="number" :value="number">{{ number }}</option>
-        </select>
-        <button @click="startGame">Démarrer</button>
-      </div>
+    
+        <div class="puzzle-options">
+            <select v-model="numberOfPieces">
+            <option disabled value="">Nombre de pièces</option>
+            <option v-for="number in pieceOptions" :key="number" :value="number">{{ number }}</option>
+            </select>
+            <button @click="startGame">Démarrer</button>
+        </div>
+        <div v-if="selectedImageId && numberOfPieces" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
+            <ClassementPuzzle :id="selectedImageId" :pieces="numberOfPieces"/>
+        </div>
     </div>
   </template>
   

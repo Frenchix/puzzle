@@ -11,7 +11,7 @@ const puzzleController = {
             const pieces = PuzzlePiece.generatePuzzle(id,nbPieces);
             response.status(200).json(pieces);
         } else {
-            console.log(images.some((image) => image.id == id))
+            // console.log(images.some((image) => image.id == id))
             response.status(400).json('Une erreur est survenue lors du chargement des pièces');
         }
         

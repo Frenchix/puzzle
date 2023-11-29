@@ -13,18 +13,47 @@ async function getClassementByIdAndPieces(id, pieces) {
         return classement.val();
     } catch (error) {
         console.log(error)
-        return new Error(error)
+        throw error;
     }
 }
 
-function getClassement() {
-    ref.once('value', (snapshot) => {
-        const data = snapshot.val();
-        console.log(data);
-        return data;
-      }, (errorObject) => {
-        console.log('La lecture des données a échoué : ' + errorObject.code);
-      });
+async function addScore(id, pieces, user, time) {
+    try {
+        const ref = db.ref(`classement/${id - 1}/${pieces}/${user}`);
+        ref.set({
+                time: time
+        });
+
+    } catch (error) {
+        throw error;
+    }
 }
 
-module.exports = { getClassementByIdAndPieces, getClassement };
+async function getBestScore(id, pieces, userName) {
+    try {
+        const ref = db.ref(`classement/${id}/${pieces}/${userName}`);
+        // const classement = await ref.once('value', (snapshot) => {
+        //     const data = snapshot.val();
+        //     console.log("data", data);
+        // }, (errorObject) => {
+        //     console.log('La lecture des données a échoué : ' + errorObject.code);
+        // });
+        const score = await ref.once('value');
+        return score.val();
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+}
+
+// function getClassement() {
+//     ref.once('value', (snapshot) => {
+//         const data = snapshot.val();
+//         console.log(data);
+//         return data;
+//       }, (errorObject) => {
+//         console.log('La lecture des données a échoué : ' + errorObject.code);
+//       });
+// }
+
+module.exports = { getClassementByIdAndPieces, addScore, getBestScore };
