@@ -3,7 +3,7 @@ import { useTimer } from '../composable/useTimer';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 
-const { gameTime, startTimer, stopTimer } = useTimer();
+const { gameTime, startTimer, stopTimer, timer } = useTimer();
 const showCompletionAnimation = ref(false);
 
 export function usePuzzlePieces(id, nbPieces) {
@@ -107,7 +107,7 @@ export function usePuzzlePieces(id, nbPieces) {
     };
     
     // Exemple de création d'un groupe
-    const addToGroup = (pieceToAdd, targetPiece) => {
+    const addToGroup = async (pieceToAdd, targetPiece) => {
         let newGroup = { id: groups.value.length > 0 ? groups.value[groups.value.length - 1].id + 1 : 1, pieces: [] };
     
         let groupToAdd = pieceToAdd.groupId ? groups.value.find(g => g.id === pieceToAdd.groupId) : null;

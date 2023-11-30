@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 
-function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPiece, ORIGINAL_WIDTH) {
-    const outputImagePath = `./pieces_a_assembler/${nbPiece}.png`
+function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPiece, ORIGINAL_WIDTH, uuid) {
+    const outputImagePath = `./pieces_a_assembler/${uuid}.png`
     sharp(maskImagePath)
         .resize({ 
             width: width,

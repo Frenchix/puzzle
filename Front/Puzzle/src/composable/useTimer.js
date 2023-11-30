@@ -1,20 +1,24 @@
 import { ref, onUnmounted } from 'vue';
+import { useUserStore } from '@/store/user'
+import { storeToRefs } from 'pinia'
 
 export function useTimer() {
-  let timer = null;
+//   let timer = null;
+    const store = useUserStore();
+    const { timer } = storeToRefs(store);
   const gameTime = ref(0);
 
   function startTimer() {
-    if (!timer) {
-      timer = setInterval(() => {
+    if (!timer.value) {
+      timer.value = setInterval(() => {
         gameTime.value++;
       }, 1000);
     }
   }
 
   function stopTimer() {
-    if (timer) {
-      clearInterval(timer);
+    if (timer.value) {
+      clearInterval(timer.value);
     //   timer = null;
     }
   }
@@ -26,8 +30,8 @@ export function useTimer() {
   }
 
   onUnmounted(() => {
-    if (timer) {
-      clearInterval(timer);
+    if (timer.value) {
+      clearInterval(timer.value);
     }
   });
 

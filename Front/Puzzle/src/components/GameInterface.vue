@@ -66,10 +66,13 @@ onMounted(async () => {
     const responseImage = await fetch(`http://localhost:5002/api/getImage/${imageId.value}`);
     const image = await responseImage.json();
     puzzleImage.value = image.src;
-    const response = await fetch(`http://localhost:5002/api/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`);
+    const response = await fetch(`http://localhost:5002/api/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
     const puzzleData = await response.json();
-    const loadImagePromises = puzzleData.map(piece => loadImage(piece.fileName));
+    const loadImagePromises = puzzleData.map((piece) => {
+        loadImage(piece.fileName);
+    });
     await Promise.all(loadImagePromises);
+
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
     pieces.value = puzzleData;
