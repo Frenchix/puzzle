@@ -1,12 +1,16 @@
 <script setup>
 import backgroundImage from "@/assets/gragas2.jpeg";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router'
 import { usePuzzlePieces } from '../composable/usePuzzlePieces';
 import ClassementPuzzle from "./ClassementPuzzle.vue";
-import { useTimer } from '../composable/useTimer';
+import { useTimerStore } from '@/store/timer'
+import { useFormat } from '../composable/useFormat';
 
-const { formatTime } = useTimer();
+const store = useTimerStore();
+const { stopTimer, initTimer } = store;
+
+const { formatTime } = useFormat();
 
 const route = useRoute();
 
@@ -54,6 +58,10 @@ function closeImageModal() {
   isImageModalOpen.value = false;
 }
 
+onUnmounted(() => {
+  stopTimer();
+})
+
 onMounted(async () => {
     //7*7 = 49 pieces
     // 10*10 = 100 pieces
@@ -61,6 +69,7 @@ onMounted(async () => {
     // 20*20 = 400 pieces
 
   try {
+    initTimer();
     imageId.value = parseInt(route.query.imageId, 10);
     nbPieces.value = parseInt(route.query.pieces, 10);
     const responseImage = await fetch(`http://localhost:5002/api/getImage/${imageId.value}`);

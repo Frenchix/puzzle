@@ -17,13 +17,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useTimer } from '../composable/useTimer';
+import { useFormat } from '../composable/useFormat';
 import { useUserStore } from '@/store/user'
 import { storeToRefs } from 'pinia'
 
 const store = useUserStore();
 const { userName, bestScore } = storeToRefs(store);
-const { formatTime } = useTimer();
+const { formatTime } = useFormat();
 
 const classement = ref([]);
 const errorMsg = ref(false);

@@ -127,7 +127,8 @@ class PuzzlePiece {
                         attachment.push({ x: Math.round(ORIGINAL_WIDTH / 4.05), y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
-                const uuid = generateID();
+                // const uuid = generateID();
+                const uuid = i;
                 const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment, width, height, uuid);
                 const maskImagePath = './pieces_ordre/' + puzzlePiece.pieceName;
 

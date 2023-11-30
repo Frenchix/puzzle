@@ -8,7 +8,6 @@ export const useUserStore = defineStore('user', () => {
     const provider = ref()
     const uid = ref()
     const bestScore = ref(0)
-    const timer = ref()
     
     function updateUser(userName, userMail, emailVerified, provider, uid) {
       this.userName = userName;
@@ -27,5 +26,5 @@ export const useUserStore = defineStore('user', () => {
         this.bestScore = 0
     }
 
-    return { userName, userMail, emailVerified, provider, uid, updateUser, logout, bestScore, timer }
+    return { userName, userMail, emailVerified, provider, uid, updateUser, logout, bestScore }
   })

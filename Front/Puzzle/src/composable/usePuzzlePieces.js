@@ -1,12 +1,17 @@
 import { ref, reactive } from 'vue';
-import { useTimer } from '../composable/useTimer';
+// import { useTimer } from '../composable/useTimer';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
+import { useTimerStore } from '@/store/timer'
 
-const { gameTime, startTimer, stopTimer, timer } = useTimer();
+
+// const { gameTime, startTimer, stopTimer, timer } = useTimer();
 const showCompletionAnimation = ref(false);
 
 export function usePuzzlePieces(id, nbPieces) {
+    const store = useTimerStore();
+    const { gameTime } = storeToRefs(store);
+    const { stopTimer, startTimer } = store;
     const pieces = ref([]);
     const groups = ref([]);
     const DISTANCE_POINTS = 50; // Seuil de proximité en pixels
