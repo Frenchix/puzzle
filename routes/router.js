@@ -17,13 +17,17 @@ router.get('/getClassement/:id/:pieces', classementController.getClassementByIdA
 router.get('/getClassement', classementController.getClassement);
 router.post('/addScore', classementController.addScore);
 router.get('/getBestScore/:id/:pieces/:userName', classementController.getBestScore);
-// router.get('/deleteFolder/:uuid', (req, res) => {
-//     const uuid = req.params.uuid;
-//     const folderName = `./pieces_a_assembler/${uuid}`;
-//     if (fs.existsSync(folderName)) {
-//         fs.rmSync(folderName, { recursive: true, force: true });
-//       }
-//     res.send('Youhou');
-// })
+router.delete('/deleteFiles', (req, res) => {
+    const pieces = req.body;
+    pieces.forEach(piece => {
+        const pieceName = `./pieces_a_assembler/${piece.uuid}.webp`;
+        fs.unlink(pieceName, (err) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+    });
+    res.send('Youhou');
+})
 
 module.exports = router;

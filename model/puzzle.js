@@ -18,6 +18,7 @@ class PuzzlePiece {
         this.y = getRandomInt(600);
         this.width = width;
         this.height = height;
+        this.uuid = uuid;
         // this.originalWidth = ORIGINAL_WIDTH;
         // this.originalHeight = ORIGINAL_HEIGHT;
     }
@@ -26,7 +27,7 @@ class PuzzlePiece {
         return `top-${this.top}_left-${this.left}_bot-${this.bottom}_right-${this.right}.png`;
     }
     fileName(uuid){
-        return `http://localhost:5002/pieces_a_assembler/${uuid}.png`;
+        return `http://localhost:5002/pieces_a_assembler/${uuid}.webp`;
     }
     
     static generatePuzzle(idToShow, nbPieces){
@@ -127,11 +128,10 @@ class PuzzlePiece {
                         attachment.push({ x: Math.round(ORIGINAL_WIDTH / 4.05), y: ORIGINAL_HEIGHT / 2, matchId: i - 1});
                     }
                 }
-                // const uuid = generateID();
-                const uuid = i;
+                const uuid = generateID();
+                // const uuid = i;
                 const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment, width, height, uuid);
                 const maskImagePath = './pieces_ordre/' + puzzlePiece.pieceName;
-
                 applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i, ORIGINAL_WIDTH, uuid);
                 rowPieces.push(puzzlePiece);
                 i++;

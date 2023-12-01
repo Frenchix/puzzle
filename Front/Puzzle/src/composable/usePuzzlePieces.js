@@ -155,10 +155,7 @@ export function usePuzzlePieces(id, nbPieces) {
             stopTimer();
             triggerCompletionAnimation();
             if (userName.value){
-                console.log("bestscore", bestScore.value)
-                console.log("gametime", gameTime.value);
                 if (bestScore.value === 0 || gameTime.value < bestScore.value){
-                    console.log("addScore");
                     addScore(userName.value);
                 }
             }

@@ -37,12 +37,40 @@ const pieceStyle = (piece) => ({
     position: 'absolute'
 });
 
-function loadImage(src) {
+// function loadImage(src) {
+//   return new Promise((resolve, reject) => {
+//     const img = new Image();
+//     img.onload = () => resolve(img);
+//     img.onerror = () => reject(new Error(`Échec du chargement de l'image : ${src}`));
+//     img.src = src;
+//   });
+// }
+
+function loadImage(src, piece, maxRetries = 3) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Échec du chargement de l'image : ${src}`));
-    img.src = src;
+    let attempts = 0;
+
+    const load = () => {
+        img.onload = () => {
+            piece.key = Date.now() + Math.random(); // Change la clé pour forcer le rerender
+            resolve(img);
+        };
+      img.onerror = () => {
+        if (attempts < maxRetries) {
+          attempts++;
+          console.log(`Tentative de rechargement de l'image : ${src}, essai n° ${attempts}`);
+          setTimeout(load, 1000); // Attente de 1 seconde avant de réessayer
+        } else {
+            hasError.value = true;
+            errorMessage.value = "Erreur lors du chargement des pièces.";
+            reject(new Error(`Échec du chargement de l'image après ${maxRetries} tentatives : ${src}`));
+        }
+      };
+      img.src = src;
+    };
+
+    load();
   });
 }
 
@@ -59,7 +87,14 @@ function closeImageModal() {
 }
 
 onUnmounted(() => {
-  stopTimer();
+    stopTimer();
+    fetch((`http://localhost:5002/api/deleteFiles`), {
+        method: 'DELETE',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pieces.value)
+    })
 })
 
 onMounted(async () => {
@@ -78,7 +113,7 @@ onMounted(async () => {
     const response = await fetch(`http://localhost:5002/api/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
     const puzzleData = await response.json();
     const loadImagePromises = puzzleData.map((piece) => {
-        loadImage(piece.fileName);
+        return loadImage(piece.fileName, piece);
     });
     await Promise.all(loadImagePromises);
 
@@ -86,6 +121,7 @@ onMounted(async () => {
     document.addEventListener('mouseup', endDrag);
     pieces.value = puzzleData;
     pieces.value.forEach(piece => {
+        piece.key = Date.now() + Math.random();
         piece.width = piece.width * scaleFactor.value;
         piece.height = piece.height * scaleFactor.value;
         piece.attachmentPoints.forEach(attachmentPoint => {
@@ -131,7 +167,7 @@ onMounted(async () => {
             <div class="puzzle-area">
                 <div class="puzzle-pieces">
                     <div v-for="piece in pieces" 
-                        :key="piece.id" 
+                        :key="piece.key" 
                         class="puzzle-piece" 
                         :style="pieceStyle(piece)"
                         @mousedown="event => startDrag(event, piece)">

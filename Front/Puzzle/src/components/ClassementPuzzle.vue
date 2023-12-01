@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watchEffect } from 'vue';
 import { useFormat } from '../composable/useFormat';
 import { useUserStore } from '@/store/user'
 import { storeToRefs } from 'pinia'
@@ -32,6 +32,10 @@ const props = defineProps({
     pieces: Number,
 })
 
+watchEffect(async () => {
+    const response = await fetch(`http://localhost:5002/api/getClassement/${props.id - 1}/${props.pieces}`);
+    classement.value = await response.json();
+})
 
 onMounted(async () => {
     try {
@@ -41,13 +45,13 @@ onMounted(async () => {
                 const bestScoreUser = await responseBestScore.json();
                 if (bestScoreUser){
                     bestScore.value = bestScoreUser.time;    
+                } else {
+                    bestScore.value = 0;
                 }
             } catch (error) {
                 console.log(error)
             }
         }
-        const response = await fetch(`http://localhost:5002/api/getClassement/${props.id - 1}/${props.pieces}`);
-        classement.value = await response.json();
     } catch (error) {
         errorMsg.value = true;
     }
