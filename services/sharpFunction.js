@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 
 function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPiece, ORIGINAL_WIDTH, uuid) {
-    const outputImagePath = `./pieces_a_assembler/${uuid}.webp`;
+    const outputImagePath = `http://localhost:5002/pieces_a_assembler/${uuid}.webp`;
 
     // Convertir le masque en WebP
     sharp(maskImagePath)
