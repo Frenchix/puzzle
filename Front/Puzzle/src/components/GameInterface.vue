@@ -88,7 +88,7 @@ function closeImageModal() {
 
 onUnmounted(() => {
     stopTimer();
-    fetch((`http://localhost:5002/api/deleteFiles`), {
+    fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
         method: 'DELETE',
         headers: {
         'Content-Type': 'application/json'
@@ -107,10 +107,10 @@ onMounted(async () => {
     initTimer();
     imageId.value = parseInt(route.query.imageId, 10);
     nbPieces.value = parseInt(route.query.pieces, 10);
-    const responseImage = await fetch(`http://localhost:5002/api/getImage/${imageId.value}`);
+    const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${imageId.value}`);
     const image = await responseImage.json();
     puzzleImage.value = image.src;
-    const response = await fetch(`http://localhost:5002/api/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
+    const response = await fetch(`${import.meta.env.VITE_HOST_API}/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
     const puzzleData = await response.json();
     const loadImagePromises = puzzleData.map((piece) => {
         return loadImage(piece.fileName, piece);

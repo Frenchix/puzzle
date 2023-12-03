@@ -195,7 +195,7 @@ export function usePuzzlePieces(id, nbPieces) {
                                     userName: userName,
                                     time: gameTime.value})
         };
-        await fetch("http://localhost:5002/api/addScore", requestOptions);
+        await fetch(`${import.meta.env.VITE_HOST_API}/addScore`, requestOptions);
     }
 
     return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag };

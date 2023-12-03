@@ -25,7 +25,7 @@ function startGame() {
 
 onMounted(async () => {
     try {
-        const response = await fetch('http://localhost:5002/api/getImages');
+        const response = await fetch(`${import.meta.env.VITE_HOST_API}/getImages`);
         images.value = await response.json();
     } catch (error) {
         console.error('Erreur lors du chargement des images', error);

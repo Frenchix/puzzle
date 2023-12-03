@@ -33,7 +33,7 @@ const props = defineProps({
 })
 
 watchEffect(async () => {
-    const response = await fetch(`http://localhost:5002/api/getClassement/${props.id - 1}/${props.pieces}`);
+    const response = await fetch(`${import.meta.env.VITE_HOST_API}/getClassement/${props.id - 1}/${props.pieces}`);
     classement.value = await response.json();
 })
 
@@ -41,7 +41,7 @@ onMounted(async () => {
     try {
         if(userName.value){
             try {
-                const responseBestScore = await fetch(`http://localhost:5002/api/getBestScore/${props.id - 1}/${props.pieces}/${userName.value}`);
+                const responseBestScore = await fetch(`${import.meta.env.VITE_HOST_API}/getBestScore/${props.id - 1}/${props.pieces}/${userName.value}`);
                 const bestScoreUser = await responseBestScore.json();
                 if (bestScoreUser){
                     bestScore.value = bestScoreUser.time;    
