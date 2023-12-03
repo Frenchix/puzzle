@@ -1,27 +1,27 @@
 const images = [
     {
         id: 1, 
-        src: 'http://localhost:5002/images/gragas.jpeg',
+        src: `${process.env.HOST}/images/gragas.jpeg`,
         srcLocal: './images/gragas.jpeg'
     },
     { 
         id: 2,
-        src: 'http://localhost:5002/images/hard.jpeg',
+        src: `${process.env.HOST}/images/hard.jpeg`,
         srcLocal: './images/hard.jpeg'
     },
     { 
         id: 3,
-        src: 'http://localhost:5002/images/leopard.jpeg',
+        src: `${process.env.HOST}/images/leopard.jpeg`,
         srcLocal: './images/leopard.jpeg'
     },
     { 
         id: 4,
-        src: 'http://localhost:5002/images/sphere.jpeg',
+        src: `${process.env.HOST}/images/sphere.jpeg`,
         srcLocal: './images/sphere.jpeg'
     },
     { 
         id: 5,
-        src: 'http://localhost:5002/images/voiture.jpeg',
+        src: `${process.env.HOST}/images/voiture.jpeg`,
         srcLocal: './images/voiture.jpeg'
     }
 ]
