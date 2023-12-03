@@ -27,7 +27,7 @@ class PuzzlePiece {
         return `top-${this.top}_left-${this.left}_bot-${this.bottom}_right-${this.right}.png`;
     }
     fileName(uuid){
-        return `http://localhost:5002/pieces_a_assembler/${uuid}.webp`;
+        return `${process.env.HOST}/pieces_a_assembler/${uuid}.webp`;
     }
     
     static generatePuzzle(idToShow, nbPieces){
