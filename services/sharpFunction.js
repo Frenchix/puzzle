@@ -7,13 +7,13 @@ function applyMask(baseImagePath, maskImagePath, left, top, width, height, nbPie
         // Convertir le masque en WebP
         sharp(maskImagePath)
             .resize({ width, height, fit: 'fill' })
-            .webp({ quality: 100, alphaQuality: 100 })
+            .webp({ quality: 80, alphaQuality: 100 })
             .toBuffer()
             .then(maskBuffer => {
                 // Convertir l'image source en WebP
                 sharp(baseImagePath)
                     .extract({ left, top, width, height })
-                    .webp({ quality: 100, alphaQuality: 100 })
+                    .webp({ quality: 80, alphaQuality: 100 })
                     .toBuffer()
                     .then(sourceBuffer => {
                         // Composite des images WebP

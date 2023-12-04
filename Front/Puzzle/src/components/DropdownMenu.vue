@@ -30,6 +30,11 @@
             class="block px-4 py-2 text-sm text-indigo-100 hover:bg-indigo-400 hover:text-indigo-100">
             Mon profil
           </router-link>
+          <router-link
+            to="/friends"
+            class="block px-4 py-2 text-sm text-indigo-100 hover:bg-indigo-400 hover:text-indigo-100">
+            Mes amis
+          </router-link>
             <button @click="clickLogout()" class="w-full text-left px-4 py-2 text-sm text-indigo-100 hover:bg-indigo-400 hover:text-indigo-100">
                 Se déconnecter
             </button>
