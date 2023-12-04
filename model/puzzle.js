@@ -30,7 +30,8 @@ class PuzzlePiece {
         return `${process.env.HOST}/pieces_a_assembler/${uuid}.webp`;
     }
     
-    static generatePuzzle(idToShow, nbPieces){
+    static async generatePuzzle(idToShow, nbPieces){
+        let puzzlePromises = [];
         const rows = Math.sqrt(nbPieces);
         const cols = Math.sqrt(nbPieces);
         const ORIGINAL_WIDTH = 2100 / rows;
@@ -132,12 +133,13 @@ class PuzzlePiece {
                 // const uuid = i;
                 const puzzlePiece = new PuzzlePiece(i, top, right, bottom, left, row, col, attachment, width, height, uuid);
                 const maskImagePath = './pieces_ordre/' + puzzlePiece.pieceName;
-                applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i, ORIGINAL_WIDTH, uuid);
+                puzzlePromises.push(applyMask(baseImagePath, maskImagePath, leftImage, topImage, width, height, i, ORIGINAL_WIDTH, uuid));
                 rowPieces.push(puzzlePiece);
                 i++;
             }
             puzzle.push(rowPieces);
         }
+        await Promise.all(puzzlePromises);
         return puzzle.flat();
     }
 }
