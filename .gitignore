@@ -3,7 +3,6 @@ node_modules
 /Front/Puzzle/.vscode
 /Front/Puzzle/.env
 /Front/Puzzle/.env.production
-pieces_a_assembler
 pieces
 serviceAccountKey.json
 Sans titre.png
