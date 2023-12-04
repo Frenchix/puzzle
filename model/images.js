@@ -6,8 +6,8 @@ const images = [
     },
     { 
         id: 2,
-        src: `${process.env.HOST}/images/hard.jpeg`,
-        srcLocal: './images/hard.jpeg'
+        src: `${process.env.HOST}/images/hard.webp`,
+        srcLocal: './images/hard.webp'
     },
     { 
         id: 3,
@@ -16,8 +16,8 @@ const images = [
     },
     { 
         id: 4,
-        src: `${process.env.HOST}/images/sphere.jpeg`,
-        srcLocal: './images/sphere.jpeg'
+        src: `${process.env.HOST}/images/sphere.webp`,
+        srcLocal: './images/sphere.webp'
     },
     { 
         id: 5,
