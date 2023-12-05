@@ -11,7 +11,30 @@ export function createUser(email, password, pseudo) {
                 updateProfile(auth.currentUser, {
                     displayName: pseudo
                   }).then(() => {
-                    resolve();
+                    const requestOptions = {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ uid: user.uid,
+                                                userName: user.displayName
+                                            })
+                    };
+                    fetch(`${import.meta.env.VITE_HOST_API}/addUser`, requestOptions)
+                        .then(response => {
+                            if (response.ok){
+                                resolve();
+                            } else {
+                               throw new Error("Erreur") ;
+                            }
+                        })
+                        .catch(error => {
+                            deleteUser(auth.currentUser).then(() => {
+                                // User deleted.
+                              }).catch((error) => {
+                                // An error ocurred
+                                // ...
+                              });
+                            reject(error);
+                        })             
                   }).catch((error) => {
                     deleteUser(auth.currentUser).then(() => {
                         // User deleted.
@@ -26,6 +49,17 @@ export function createUser(email, password, pseudo) {
                 reject(error);
             });
      });
+}
+
+async function addUser(uid, userName) {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: uid,
+                                userName: userName
+                            })
+    };
+    await fetch(`${import.meta.env.VITE_HOST_API}/addUser`, requestOptions);
 }
 
 export function logoutUser(){

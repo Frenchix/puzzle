@@ -2,6 +2,7 @@ const express = require('express');
 const puzzleController = require('../controller/puzzleController');
 const imageController = require('../controller/imageController');
 const classementController = require('../controller/classementController');
+const userController = require('../controller/userController');
 const router = express.Router();
 const fs = require('fs');
 
@@ -28,6 +29,9 @@ router.delete('/deleteFiles', (req, res) => {
           });
     });
     res.send('Youhou');
-})
+});
+router.get('/getFriends/:uid', userController.getFriends);
+router.get('/getUsername/:uid', userController.getUsername);
+router.post('/addUser', userController.addUser);
 
 module.exports = router;

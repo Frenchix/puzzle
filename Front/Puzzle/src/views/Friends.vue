@@ -1,6 +1,7 @@
 <script setup>
 import Header from '../components/Header.vue';
 import SearchFriends from '../components/SearchFriends.vue';
+import ListFriends from '../components/ListFriends.vue';
 
 </script>
 
@@ -9,6 +10,7 @@ import SearchFriends from '../components/SearchFriends.vue';
         <Header/>
     </header>
     <SearchFriends></SearchFriends>
+    <ListFriends></ListFriends>
 </template>
 
 
