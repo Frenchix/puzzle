@@ -33,5 +33,8 @@ router.delete('/deleteFiles', (req, res) => {
 router.get('/getFriends/:uid', userController.getFriends);
 router.get('/getUsername/:uid', userController.getUsername);
 router.post('/addUser', userController.addUser);
+router.post('/addFriendRequest', userController.addFriendRequest);
+router.get('/getRequestFriend/:uid', userController.getRequestFriend);
+router.post('/responseFriendRequest', userController.responseFriendRequest);
 
 module.exports = router;

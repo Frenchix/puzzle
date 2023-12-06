@@ -39,7 +39,7 @@
                             required
                             />
                       </div>
-                      <div v-if="provider !== 'google.com'" class="text-center mt-6">
+                      <!-- <div v-if="provider !== 'google.com'" class="text-center mt-6">
                         <button
                           class="bg-gray-900 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full"
                           type="submit"
@@ -47,7 +47,7 @@
                         >
                           Modifier mon pseudo
                         </button>
-                      </div>
+                      </div> -->
                     </form>
                     <form @submit.prevent="editEmail()">
                       <div class="relative w-full mb-3">

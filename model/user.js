@@ -1,15 +1,5 @@
 const db = require('../database/firebase');
 
-// async function getFriends(uid) {
-//     try {
-//         const ref = db.ref(`friends/${uid}`);
-//         const friends = await ref.once('value');
-//         return friends.val();
-//     } catch (error) {
-//         console.log(error)
-//         throw error;
-//     }
-// }
 async function getFriends(uid) {
     const friendsRef = db.ref(`friends/${uid}`);
     const userRef = db.ref('users');
@@ -37,15 +27,93 @@ async function getFriends(uid) {
     }
 }
 
+async function getRequestFriend(uid) {
+    try {
+        const ref = db.ref(`friendRequest/${uid}`);
+        const friends = await ref.once('value');
+        return friends.val();
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+}
+
+async function responseFriendRequest(uid, uidFriend, friendName, answer) {
+    try {
+        let friendsList = []
+        if (answer) {
+            await addFriend(uid, uidFriend);
+            await addFriend(uidFriend, uid);
+        }
+        const ref = db.ref(`friendRequest/${uid}/${friendName}`);
+        await ref.remove()
+        friendsList = await getFriends(uid);
+        return friendsList;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function addFriend(uid, uidFriend) {
+    try {
+        const friendsRef = db.ref(`friends/${uid}`);
+        const friends = await friendsRef.once('value');
+        const friendsList = friends.val() || []; // Si la liste n'existe pas, utilisez un tableau vide
+
+        if (!friendsList.includes(uidFriend)) {
+            friendsList.push(uidFriend); // Ajout du nouvel ami à la liste
+
+            // Mise à jour de la liste dans la base de données
+            friendsRef.set(friendsList)
+                .then(() => console.log('Liste d\'amis mise à jour avec succès'))
+                .catch((error) => {
+                    throw new Error(error)
+                });
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 async function addUser(uid, user) {
     try {
         const ref = db.ref(`users/${uid}`);
         ref.set({
                 pseudo: user
         });
+        const refPseudos = db.ref(`pseudos/${user}`);
+        refPseudos.set({
+            uid: uid
+    });
     } catch (error) {
         throw error;
     }
 }
 
-module.exports = { getFriends, addUser };
+async function addFriendRequest(uid, user, friend) {
+    try {
+        const pseudosRef = db.ref(`pseudos/${friend}`);
+        const pseudos = await pseudosRef.once('value');
+        const pseudoId = pseudos.val();
+
+        const friendsRef = db.ref(`friends/${uid}`);
+        const friends = await friendsRef.once('value');
+        const friendsList = friends.val() || []; // Si la liste n'existe pas, utilisez un tableau vide
+
+        if (!friendsList.includes(pseudoId.uid)) {
+            if(pseudoId) {
+                const ref = db.ref(`friendRequest/${pseudoId.uid}/${user}`);
+                ref.set({
+                        uid: uid,
+                        status: "pending"
+                });
+            } else {
+                throw new Error('Ce pseudo n existe pas');
+            }
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { getFriends, addUser, addFriendRequest, getRequestFriend, responseFriendRequest };

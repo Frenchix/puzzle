@@ -51,17 +51,6 @@ export function createUser(email, password, pseudo) {
      });
 }
 
-async function addUser(uid, userName) {
-    const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid: uid,
-                                userName: userName
-                            })
-    };
-    await fetch(`${import.meta.env.VITE_HOST_API}/addUser`, requestOptions);
-}
-
 export function logoutUser(){
     const store = useUserStore();
     const { logout } = store;
