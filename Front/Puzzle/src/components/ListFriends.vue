@@ -4,7 +4,12 @@
         <div v-if="friends.length > 0">
             <ul class="px-2 pt-2">
                 <li v-for="friend in friends" class="flex justify-center gap-5 items-center py-2">
-                    <div class="w-1/2">{{ friend }}</div>
+                    <div class="w-1/2 flex gap-5 items-center">
+                        <div>
+                            {{ friend.pseudo }}
+                        </div>
+                        <div class="w-6 h-6 rounded-[20px]" :class="friend.status == 'online' ? 'bg-green-500' : 'bg-red-500'"></div>
+                    </div>
                     <button class="bg-green-600">Défier</button>
                 </li>
             </ul>

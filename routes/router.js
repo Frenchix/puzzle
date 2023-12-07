@@ -36,5 +36,6 @@ router.post('/addUser', userController.addUser);
 router.post('/addFriendRequest', userController.addFriendRequest);
 router.get('/getRequestFriend/:uid', userController.getRequestFriend);
 router.post('/responseFriendRequest', userController.responseFriendRequest);
+router.post('/updateStatus', userController.updateStatus);
 
 module.exports = router;

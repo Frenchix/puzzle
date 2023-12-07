@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from "firebase/auth";
 import { onAuthStateChanged } from 'firebase/auth'
+import { ref, onValue } from "firebase/database";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -27,6 +29,40 @@ export function getCurrentUser() {
         reject
       )
     })
+  }
+
+  export function setupUserOnlineStatusTracking() {
+    const db = getDatabase(firebaseApp);
+  
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Référence à l'état de connexion de Firebase
+        const connectedRef = ref(db, '.info/connected');
+  
+        onValue(connectedRef, (snapshot) => {
+          if (snapshot.val() === true) {
+            // L'utilisateur est connecté
+            updateUserStatusOnServer(user.uid, 'online');
+            // Configurer l'écouteur pour la déconnexion
+            window.addEventListener('beforeunload', () => updateUserStatusOnServer(user.uid, 'offline'));
+          }
+        });
+      }
+    });
+  }
+  
+  // Fonction pour envoyer une requête de mise à jour de statut au serveur backend
+  function updateUserStatusOnServer(uid, status) {
+    fetch(`${import.meta.env.VITE_HOST_API}/updateStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ uid, status })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Erreur lors de la mise à jour du statut:', error));
   }
 // used for the databas refs
 // const db = getDatabase(app)

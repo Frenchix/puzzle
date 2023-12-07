@@ -15,7 +15,7 @@ async function getFriends(uid) {
                 const friendSnapshot = await userRef.child(friendId).once('value');
                 const friend = friendSnapshot.val();
                 if (friend) {
-                    friendsDetails.push(friend.pseudo); // ou tout autre détail souhaité
+                    friendsDetails.push(friend); // ou tout autre détail souhaité
                 }
             }
         }
@@ -90,6 +90,16 @@ async function addUser(uid, user) {
     }
 }
 
+async function updateStatus(uid, status) {
+    try {
+        const ref = db.ref(`users/${uid}/status`);
+        await ref.set(status);
+        // await admin.database().ref(`users/${userId}/status`).set(status);
+      } catch (error) {
+        throw error;
+      }
+}
+
 async function addFriendRequest(uid, user, friend) {
     try {
         const pseudosRef = db.ref(`pseudos/${friend}`);
@@ -116,4 +126,4 @@ async function addFriendRequest(uid, user, friend) {
     }
 }
 
-module.exports = { getFriends, addUser, addFriendRequest, getRequestFriend, responseFriendRequest };
+module.exports = { getFriends, addUser, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus };

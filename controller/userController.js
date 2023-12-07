@@ -1,4 +1,4 @@
-const { getFriends, addUser, getUsername, addFriendRequest, getRequestFriend, responseFriendRequest } = require('../model/user');
+const { getFriends, addUser, getUsername, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus } = require('../model/user');
 
 const userController = {
     getFriends: async (request, response) => {
@@ -16,6 +16,17 @@ const userController = {
             const user = request.body.userName;
             await addUser(uid, user);
             response.status(200).json("user created");
+        } catch (error) {
+            console.log("error", error)
+            response.status(500).json(error.message);
+        }
+    },
+    updateStatus: async (request, response) => {
+        try {
+            const uid = request.body.uid;
+            const status = request.body.status;
+            await updateStatus(uid, status);
+            response.status(200).json("Status mis à jour");
         } catch (error) {
             console.log("error", error)
             response.status(500).json(error.message);
