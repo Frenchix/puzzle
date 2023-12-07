@@ -3,6 +3,7 @@ const puzzleController = require('../controller/puzzleController');
 const imageController = require('../controller/imageController');
 const classementController = require('../controller/classementController');
 const userController = require('../controller/userController');
+const roomController = require('../controller/roomController');
 const router = express.Router();
 const fs = require('fs');
 
@@ -37,5 +38,8 @@ router.post('/addFriendRequest', userController.addFriendRequest);
 router.get('/getRequestFriend/:uid', userController.getRequestFriend);
 router.post('/responseFriendRequest', userController.responseFriendRequest);
 router.post('/updateStatus', userController.updateStatus);
+
+router.post('/addRoom', roomController.addRoom);
+router.delete('/leaveRoom', roomController.leaveRoom);
 
 module.exports = router;

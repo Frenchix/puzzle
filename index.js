@@ -6,6 +6,9 @@ const cors = require('cors');
 const path = require('path');
 const server = http.createServer(app);
 const router = require('./routes/router.js');
+const setupWebSocket = require('./services/socketManager');
+
+setupWebSocket(server);
 
 const port = process.env.PORT || 5002
 app.use(express.json());
