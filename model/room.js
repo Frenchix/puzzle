@@ -6,6 +6,7 @@ async function addRoom (uid, userName) {
         const uuid = generateID();
         const ref = db.ref(`rooms/${uuid}/participants/${uid}`);
         await ref.set(userName);
+        return uuid;
     } catch (error) {
         throw error;
     }

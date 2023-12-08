@@ -10,7 +10,7 @@
                         </div>
                         <div class="w-6 h-6 rounded-[20px]" :class="friend.status == 'online' ? 'bg-green-500' : 'bg-red-500'"></div>
                     </div>
-                    <button class="bg-green-600">Défier</button>
+                    <button class="bg-green-600" @click="launchRoom()">Défier</button>
                 </li>
             </ul>
         </div>
@@ -39,14 +39,38 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toast-notification'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 const $toast = useToast();
 
 const store = useUserStore();
-const { uid } = storeToRefs(store);
+const { uid, userName } = storeToRefs(store);
 
 const friends = ref([]);
 const friendsRequest = ref([]);
+let uuidRoom = 0;
+
+async function launchRoom() {
+    try {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid: uid.value,
+                                    userName: userName.value
+                                })
+            };
+        
+        const response = await fetch(`${import.meta.env.VITE_HOST_API}/addRoom`, requestOptions);
+        uuidRoom = await response.json();
+        router.push({
+            path: `/room/${uuidRoom}`,
+        });
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 async function responseFriendRequest(answer, index, uidFriend) {
     try {

@@ -5,8 +5,8 @@ const roomController = {
         try {
             const uid = request.body.uid;
             const userName = request.body.userName;
-            await addRoom(uid, userName);
-            response.status(200).json("room created");
+            const uuidRoom = await addRoom(uid, userName);
+            response.status(200).json(uuidRoom);
         } catch (error) {
             console.log("error", error)
             response.status(500).json(error.message);

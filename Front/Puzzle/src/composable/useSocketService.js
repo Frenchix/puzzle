@@ -8,8 +8,8 @@ class SocketService {
         this.socket = io(SOCKET_URL);
     }
 
-    joinRoom(roomId, userId) {
-        this.socket.emit('joinRoom', { roomId, userId });
+    joinRoom(roomId, userName) {
+        this.socket.emit('joinRoom', { roomId, userName });
     }
 
     leaveRoom(roomId, userId) {
@@ -18,6 +18,10 @@ class SocketService {
 
     onRoomUpdate(callback) {
         this.socket.on('roomUpdate', callback);
+    }
+
+    onUpdatePlayerList(callback){
+        this.socket.on('updatePlayerList', callback);
     }
 
     // Vous pouvez ajouter d'autres méthodes selon vos besoins
