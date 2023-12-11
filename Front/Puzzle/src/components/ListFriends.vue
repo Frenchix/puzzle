@@ -35,18 +35,18 @@
 
 <script setup>
 import curly from "@/assets/curly.jpg";
-import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/store/user'
-import { storeToRefs } from 'pinia'
-import { useToast } from 'vue-toast-notification'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useUserStore } from '@/store/user';
+import { storeToRefs } from 'pinia';
+import { useToast } from 'vue-toast-notification';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 const $toast = useToast();
 
 const store = useUserStore();
-const { uid, userName } = storeToRefs(store);
+const { uid, userName} = storeToRefs(store);
 
 const friends = ref([]);
 const friendsRequest = ref([]);
@@ -64,6 +64,7 @@ async function launchRoom() {
         
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/addRoom`, requestOptions);
         uuidRoom = await response.json();
+        localStorage.setItem('isAdmin', true);
         router.push({
             path: `/room/${uuidRoom}`,
         });

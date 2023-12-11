@@ -46,6 +46,12 @@ const router = createRouter({
         name: "Room",
         component: () => import('../views/Room.vue')
     },
+    {
+        path: "/:catchAll(.*)",
+        redirect: {
+            name: "home"
+        }
+    },
   ]
 })
 
@@ -64,6 +70,10 @@ router.beforeEach(async (to, from) => {
                 return { name : 'Home' }
             }
             updateUser(user.displayName, user.email, user.emailVerified, user.providerData[0].providerId, user.uid)
+        } else {
+            if (to.name === 'Room') {
+                return { name : 'home' }
+            }
         }
         return true
     } catch (error) {

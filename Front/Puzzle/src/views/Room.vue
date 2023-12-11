@@ -8,19 +8,15 @@ import { useUserStore } from '@/store/user'
 import { storeToRefs } from 'pinia'
 
 const store = useUserStore();
-const { uid, userName } = storeToRefs(store);
+const { userName } = storeToRefs(store);
 
 const route = useRoute();
 
-const players = ref([]);
+const roomId = ref();
 
 onMounted(() => {
-    const roomId = route.params.id;
-    socketService.joinRoom(roomId, userName.value);
-    socketService.onUpdatePlayerList((data) => {
-        // Traiter les données de mise à jour de la room
-        players.value = data;
-    });
+    roomId.value = route.params.id;
+    socketService.joinRoom(roomId.value, userName.value);
 });
 
 // onUnmounted(() => {
@@ -32,5 +28,5 @@ onMounted(() => {
     <header>
         <Header/>
     </header>
-    <GameDuel></GameDuel>
+    <GameDuel :roomId="roomId"></GameDuel>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import backgroundImage from "@/assets/gragas2.jpeg";
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router';
 import { usePuzzlePieces } from '../composable/usePuzzlePieces';
 import ClassementPuzzle from "./ClassementPuzzle.vue";
 import { useTimerStore } from '@/store/timer'
@@ -16,16 +16,17 @@ const route = useRoute();
 
 const isImageModalOpen = ref(false);
 
-const imageId = ref(null);
-const nbPieces = ref(null);
-const isLoading = ref(true);
-const hasError = ref(false);
-const errorMessage = ref('');
+// const imageId = ref(null);
+// const nbPieces = ref(null);
+// const isLoading = ref(true);
+// const hasError = ref(false);
+// const errorMessage = ref('');
 
-const puzzleImage = ref(null);
+// const puzzleImage = ref(null);
+const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId']);
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
-const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag } = usePuzzlePieces(imageId, nbPieces);
+const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage } = usePuzzlePieces(props.imageId, props.nbPieces);
 
 const pieceStyle = (piece) => ({
     left: piece.x + 'px',
@@ -46,34 +47,6 @@ const pieceStyle = (piece) => ({
 //   });
 // }
 
-function loadImage(src, piece, maxRetries = 3) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    let attempts = 0;
-
-    const load = () => {
-        img.onload = () => {
-            piece.key = Date.now() + Math.random(); // Change la clé pour forcer le rerender
-            resolve(img);
-        };
-      img.onerror = () => {
-        if (attempts < maxRetries) {
-          attempts++;
-          console.log(`Tentative de rechargement de l'image : ${src}, essai n° ${attempts}`);
-          setTimeout(load, 1000); // Attente de 1 seconde avant de réessayer
-        } else {
-            hasError.value = true;
-            errorMessage.value = "Erreur lors du chargement des pièces.";
-            reject(new Error(`Échec du chargement de l'image après ${maxRetries} tentatives : ${src}`));
-        }
-      };
-      img.src = src;
-    };
-
-    load();
-  });
-}
-
 async function restartGame() {
     location.reload() 
 }
@@ -88,13 +61,6 @@ function closeImageModal() {
 
 onUnmounted(() => {
     stopTimer();
-    fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
-        method: 'DELETE',
-        headers: {
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pieces.value)
-    })
 })
 
 onMounted(async () => {
@@ -102,24 +68,24 @@ onMounted(async () => {
     // 10*10 = 100 pieces
     // 15*15 = 225 pieces
     // 20*20 = 400 pieces
-
   try {
+    console.log(props)
     initTimer();
-    imageId.value = parseInt(route.query.imageId, 10);
-    nbPieces.value = parseInt(route.query.pieces, 10);
-    const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${imageId.value}`);
-    const image = await responseImage.json();
-    puzzleImage.value = image.src;
-    const response = await fetch(`${import.meta.env.VITE_HOST_API}/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
-    const puzzleData = await response.json();
-    const loadImagePromises = puzzleData.map((piece) => {
+    // imageId.value = parseInt(route.query.imageId, 10);
+    // nbPieces.value = parseInt(route.query.pieces, 10);
+    // const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${imageId.value}`);
+    // const image = await responseImage.json();
+    // puzzleImage.value = image.src;
+    // const response = await fetch(`${import.meta.env.VITE_HOST_API}/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
+    // const puzzleData = await response.json();
+    const loadImagePromises = props.puzzleData.map((piece) => {
         return loadImage(piece.fileName, piece);
     });
     await Promise.all(loadImagePromises);
 
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
-    pieces.value = puzzleData;
+    pieces.value = props.puzzleData;
     pieces.value.forEach(piece => {
         piece.key = Date.now() + Math.random();
         piece.width = piece.width * scaleFactor.value;
@@ -129,11 +95,18 @@ onMounted(async () => {
             attachmentPoint.y *= scaleFactor.value;
         });
     });
-    isLoading.value = false;
+    // isLoading.value = false;
+    fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
+        method: 'DELETE',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pieces.value)
+    });
   } catch (error) {
-    hasError.value = true;
-    errorMessage.value = "Erreur lors du chargement des pièces.";
-    isLoading.value = false;
+    // hasError.value = true;
+    // errorMessage.value = "Erreur lors du chargement des pièces.";
+    // isLoading.value = false;
     console.error('Erreur lors du chargement des données du puzzle:', error);
   }
 });
@@ -142,25 +115,25 @@ onMounted(async () => {
 
 <template>
     <!-- Loading -->
-    <div v-if="isLoading" class="text-center text-lg text-[#007bff]">Chargement...</div>
+    <!-- <div v-if="isLoading" class="text-center text-lg text-[#007bff]">Chargement...</div> -->
     <!-- Message d'erreur -->
-    <div v-if="hasError" class="text-center text-lg text-red-500">{{ errorMessage }}</div>
+    <!-- <div v-if="props.hasError" class="text-center text-lg text-red-500">{{ props.errorMessage }}</div> -->
 
     <div class="w-full flex flex-col-reverse lg:flex-row">
-        <div v-if="imageId && nbPieces" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
-            <ClassementPuzzle :id="imageId" :pieces="nbPieces"/>
+        <div v-if="props.imageId && props.nbPieces" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
+            <ClassementPuzzle :id="props.imageId" :pieces="props.nbPieces"/>
         </div>
-        <div v-if="!isLoading && !hasError" class="game-container w-10/12 min-w-[900px] m-auto">
+        <div class="game-container w-10/12 min-w-[900px] m-auto">
             <div class="w-full flex justify-around">
                 <button class="button h-fit" @click="restartGame">Recommencer</button>
                 <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
                 <div class="puzzle-preview" @click="enlargeImage">
-                    <img :src="puzzleImage" alt="Aperçu du puzzle" />
+                    <img :src="props.puzzleImage" alt="Aperçu du puzzle" />
                 </div>
             </div>
             <div v-if="isImageModalOpen" class="image-modal" @click="closeImageModal">
                 <div class="image-modal-content" @click.stop>
-                    <img :src="puzzleImage" alt="Agrandissement du puzzle" />
+                    <img :src="props.puzzleImage" alt="Agrandissement du puzzle" />
                     <button class="button close-modal" @click="closeImageModal">Fermer</button>
                 </div>
             </div>

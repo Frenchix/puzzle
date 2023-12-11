@@ -16,6 +16,10 @@ class SocketService {
         this.socket.emit('leaveRoom', { roomId, userId });
     }
 
+    puzzleSelected(roomId, imageId, numberPieces) {
+        this.socket.emit('puzzleSelected', roomId, imageId, numberPieces );
+    }
+
     onRoomUpdate(callback) {
         this.socket.on('roomUpdate', callback);
     }
@@ -23,6 +27,20 @@ class SocketService {
     onUpdatePlayerList(callback){
         this.socket.on('updatePlayerList', callback);
     }
+
+    onPuzzleReady(callback){
+        this.socket.on('puzzleReady', callback);
+    }
+    
+    onStartCountdown(callback){
+        this.socket.on('startCountdown', callback);
+    }
+    // socket.on('startCountdown', (data) => {
+    //     // Démarrer un compte à rebours
+    //     startCountdown(data.countdown).then(() => {
+    //         // Commencer la partie
+    //     });
+    // });
 
     // Vous pouvez ajouter d'autres méthodes selon vos besoins
 }

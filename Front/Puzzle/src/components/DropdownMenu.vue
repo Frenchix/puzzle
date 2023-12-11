@@ -65,7 +65,7 @@ async function clickLogout(){
     try {
        await logoutUser();   
        let instance = $toast.success('Vous êtes bien déconnecté');
-       router.replace('Login')
+       router.replace('/login')
     } catch (error) {
         let instance = $toast.error("Un problème est survenu lors de la déconnexion!");
     }

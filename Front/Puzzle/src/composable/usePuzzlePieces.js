@@ -148,8 +148,7 @@ export function usePuzzlePieces(id, nbPieces) {
             newGroup.pieces.push(targetPiece);
         }
         groups.value.push(newGroup);
-        // console.log(groups)
-        if(groups.value[0].pieces.length == nbPieces.value){
+        if(groups.value[0].pieces.length == nbPieces){
             const store = useUserStore();
             const { userName, bestScore } = storeToRefs(store);
             stopTimer();
@@ -190,13 +189,41 @@ export function usePuzzlePieces(id, nbPieces) {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: id.value,
-                                    nbPieces: nbPieces.value,
+            body: JSON.stringify({ id: id,
+                                    nbPieces: nbPieces,
                                     userName: userName,
                                     time: gameTime.value})
         };
         await fetch(`${import.meta.env.VITE_HOST_API}/addScore`, requestOptions);
     }
 
-    return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag };
+    function loadImage(src, piece, maxRetries = 3) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          let attempts = 0;
+      
+          const load = () => {
+              img.onload = () => {
+                  piece.key = Date.now() + Math.random(); // Change la clé pour forcer le rerender
+                  resolve(img);
+              };
+            img.onerror = () => {
+              if (attempts < maxRetries) {
+                attempts++;
+                console.log(`Tentative de rechargement de l'image : ${src}, essai n° ${attempts}`);
+                setTimeout(load, 1000); // Attente de 1 seconde avant de réessayer
+              } else {
+                  hasError.value = true;
+                  errorMessage.value = "Erreur lors du chargement des pièces.";
+                  reject(new Error(`Échec du chargement de l'image après ${maxRetries} tentatives : ${src}`));
+              }
+            };
+            img.src = src;
+          };
+      
+          load();
+        });
+      }
+
+    return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage };
 }
