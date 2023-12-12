@@ -20,6 +20,10 @@ class SocketService {
         this.socket.emit('puzzleSelected', roomId, imageId, numberPieces );
     }
 
+    readyToPlay(roomId) {
+        this.socket.emit('readyToPlay', roomId );
+    }
+
     onRoomUpdate(callback) {
         this.socket.on('roomUpdate', callback);
     }

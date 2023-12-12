@@ -15,6 +15,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import socketService from '../composable/useSocketService';
+import { useUserStore } from '@/store/user'
+import { storeToRefs } from 'pinia'
+
+const store = useUserStore();
+const { id } = storeToRefs(store);
 
 const players = ref([]);
 
@@ -22,6 +27,7 @@ onMounted(() => {
     socketService.onUpdatePlayerList((data) => {
         // Traiter les données de mise à jour de la room
         players.value = data;
+        console.log(data)
     });
 });
 </script>

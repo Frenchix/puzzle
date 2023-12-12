@@ -213,8 +213,8 @@ export function usePuzzlePieces(id, nbPieces) {
                 console.log(`Tentative de rechargement de l'image : ${src}, essai n° ${attempts}`);
                 setTimeout(load, 1000); // Attente de 1 seconde avant de réessayer
               } else {
-                  hasError.value = true;
-                  errorMessage.value = "Erreur lors du chargement des pièces.";
+                //   hasError.value = true;
+                //   errorMessage.value = "Erreur lors du chargement des pièces.";
                   reject(new Error(`Échec du chargement de l'image après ${maxRetries} tentatives : ${src}`));
               }
             };

@@ -3,6 +3,7 @@ import backgroundImage from "@/assets/gragas2.jpeg";
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { usePuzzlePieces } from '../composable/usePuzzlePieces';
+import socketService from '../composable/useSocketService';
 import ClassementPuzzle from "./ClassementPuzzle.vue";
 import { useTimerStore } from '@/store/timer'
 import { useFormat } from '../composable/useFormat';
@@ -18,12 +19,12 @@ const isImageModalOpen = ref(false);
 
 // const imageId = ref(null);
 // const nbPieces = ref(null);
-// const isLoading = ref(true);
-// const hasError = ref(false);
-// const errorMessage = ref('');
+const isLoading = ref(true);
+const hasError = ref(false);
+const errorMessage = ref('');
 
 // const puzzleImage = ref(null);
-const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId']);
+const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId', 'duel', 'roomId']);
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
 const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage } = usePuzzlePieces(props.imageId, props.nbPieces);
@@ -46,6 +47,9 @@ const pieceStyle = (piece) => ({
 //     img.src = src;
 //   });
 // }
+function readyToPlay() {
+    socketService.readyToPlay(props.roomId);
+}
 
 async function restartGame() {
     location.reload() 
@@ -95,18 +99,20 @@ onMounted(async () => {
             attachmentPoint.y *= scaleFactor.value;
         });
     });
-    // isLoading.value = false;
-    fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
-        method: 'DELETE',
-        headers: {
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pieces.value)
-    });
+    if (!props.duel) {
+        fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pieces.value)
+        });
+    } 
+    isLoading.value = false;
   } catch (error) {
-    // hasError.value = true;
-    // errorMessage.value = "Erreur lors du chargement des pièces.";
-    // isLoading.value = false;
+    hasError.value = true;
+    errorMessage.value = "Erreur lors du chargement des pièces.";
+    isLoading.value = false;
     console.error('Erreur lors du chargement des données du puzzle:', error);
   }
 });
@@ -115,17 +121,18 @@ onMounted(async () => {
 
 <template>
     <!-- Loading -->
-    <!-- <div v-if="isLoading" class="text-center text-lg text-[#007bff]">Chargement...</div> -->
+    <div v-if="isLoading" class="text-center text-lg text-[#007bff]">Chargement...</div>
     <!-- Message d'erreur -->
-    <!-- <div v-if="props.hasError" class="text-center text-lg text-red-500">{{ props.errorMessage }}</div> -->
+    <div v-if="hasError" class="text-center text-lg text-red-500">{{ errorMessage }}</div>
 
-    <div class="w-full flex flex-col-reverse lg:flex-row">
-        <div v-if="props.imageId && props.nbPieces" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
+    <div v-if="!isLoading && !hasError" class="w-full flex flex-col-reverse lg:flex-row">
+        <div v-if="props.imageId && props.nbPieces && !duel" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
             <ClassementPuzzle :id="props.imageId" :pieces="props.nbPieces"/>
         </div>
-        <div class="game-container w-10/12 min-w-[900px] m-auto">
+        <div class="game-container flex-auto min-w-[900px] m-auto">
             <div class="w-full flex justify-around">
-                <button class="button h-fit" @click="restartGame">Recommencer</button>
+                <button v-if="props.duel" class="button h-fit" @click="readyToPlay">Prêt</button>
+                <button v-else class="button h-fit" @click="restartGame">Recommencer</button>
                 <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
                 <div class="puzzle-preview" @click="enlargeImage">
                     <img :src="props.puzzleImage" alt="Aperçu du puzzle" />

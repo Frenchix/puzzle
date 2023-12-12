@@ -49,11 +49,33 @@ module.exports = function(server) {
             // Par exemple, notifier les autres utilisateurs dans la room, mettre à jour la base de données, etc.
         });
 
-        socket.on('puzzleSelected', async (roomId, imageId, numberPieces) => {
+        socket.on('puzzleSelected', async (roomId, imageId, numberPieces, puzzleImage) => {
             // Générer les pièces du puzzle
             const pieces = await PuzzlePiece.generatePuzzle(imageId, numberPieces);
             // Informer les clients
-            io.to(roomId).emit('puzzleReady', { pieces: pieces });
+            io.to(roomId).emit('puzzleReady', { pieces: pieces, imageId: imageId, nbPieces: numberPieces, puzzleImage: puzzleImage });
+        });
+
+        socket.on('readyToPlay', (roomId) => {
+            // Vérifier si tous les utilisateurs ont chargé le puzzle
+            // checkAllUsersLoaded(roomId).then(allLoaded => {
+            //     if (allLoaded) {
+            //         // Démarrer le compte à rebours
+            //         io.to(roomId).emit('startCountdown', { countdown: 5 });
+            //     }
+            // });
+            if (roomsInfo[roomId]) {
+                // Trouver l'utilisateur dans la room
+                const playerIndex = roomsInfo[roomId].findIndex(player => player.id === socket.id);
+                
+                if (playerIndex !== -1) {
+                    // Mettre à jour le statut 'ready' de l'utilisateur
+                    roomsInfo[roomId][playerIndex].ready = true;
+                    
+                    // Envoyer une mise à jour à tous les membres de la room
+                    io.to(roomId).emit('updatePlayerList', roomsInfo[roomId]);
+                }
+            }
         });
     
         socket.on('puzzleLoaded', (roomId) => {

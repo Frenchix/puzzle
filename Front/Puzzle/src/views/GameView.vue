@@ -48,7 +48,7 @@ onMounted(async () => {
     <div v-if="isLoading" class="text-center text-lg text-[#007bff]">Chargement...</div>
     <!-- Message d'erreur -->
     <div v-if="hasError" class="text-center text-lg text-red-500">{{ errorMessage }}</div>
-    <GameInterface v-if="!isLoading && !hasError" :puzzleImage="puzzleImage" :puzzleData="puzzleData" :imageId="imageId" :nbPieces="nbPieces" duel="false"></GameInterface>
+    <GameInterface v-if="!isLoading && !hasError" :puzzleImage="puzzleImage" :puzzleData="puzzleData" :imageId="imageId" :nbPieces="nbPieces" duel="true"></GameInterface>
 </template>
 
 
