@@ -104,6 +104,9 @@ onMounted(async () => {
         isLoading.value = false
         isLaunched.value = true
     });
+    socketService.changePuzzle(() => {
+        isLaunched.value = false
+    })
 })
 </script>
 

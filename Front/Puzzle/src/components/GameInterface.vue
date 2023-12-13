@@ -41,8 +41,7 @@ function readyToPlay() {
 }
 
 function changePuzzle() {
-    
-    socketService.readyToPlay(props.roomId);
+    socketService.changePuzzle(props.roomId);
 }
 
 async function restartGame() {
@@ -127,7 +126,7 @@ onMounted(async () => {
             <div class="w-full flex justify-around">
                 <div v-if="props.duel === 'oui'">
                     <button v-if="!isReady && !props.isAdmin" class="button h-fit" @click="readyToPlay">Prêt</button>
-                    <button v-if="props.isAdmin" class="button h-fit" @click="$emit('changePuzzle')">Changer de puzzle</button>
+                    <button v-if="props.isAdmin" class="button h-fit" @click="changePuzzle">Changer de puzzle</button>
                 </div>
                 <div v-else>
                     <button class="button h-fit" @click="restartGame">Recommencer</button>

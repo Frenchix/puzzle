@@ -85,6 +85,10 @@ module.exports = function(server) {
                 }
             }
         });
+
+        socket.on('changePuzzle', (roomId) => {
+            io.to(roomId).emit('changePuzzle');
+        });
     });
 
     return io;

@@ -24,6 +24,14 @@ class SocketService {
         this.socket.emit('readyToPlay', roomId );
     }
 
+    changePuzzle(roomId) {
+        this.socket.emit('changePuzzle', roomId );
+    }
+
+    onchangePuzzle(callback) {
+        this.socket.on('changePuzzle', callback);
+    }
+
     onRoomUpdate(callback) {
         this.socket.on('roomUpdate', callback);
     }
