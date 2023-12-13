@@ -64,7 +64,7 @@ async function launchRoom() {
         
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/addRoom`, requestOptions);
         uuidRoom = await response.json();
-        localStorage.setItem('isAdmin', true);
+        // localStorage.setItem('isAdmin', true);
         router.push({
             path: `/room/${uuidRoom}`,
         });

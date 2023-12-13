@@ -1,30 +1,26 @@
 <script setup>
-import backgroundImage from "@/assets/gragas2.jpeg";
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
 import { usePuzzlePieces } from '../composable/usePuzzlePieces';
 import socketService from '../composable/useSocketService';
 import ClassementPuzzle from "./ClassementPuzzle.vue";
 import { useTimerStore } from '@/store/timer'
 import { useFormat } from '../composable/useFormat';
 
+const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId', 'duel', 'roomId', 'isAdmin']);
+
 const store = useTimerStore();
-const { stopTimer, initTimer } = store;
+const { stopTimer, initTimer, startTimer } = store;
 
 const { formatTime } = useFormat();
 
-const route = useRoute();
-
 const isImageModalOpen = ref(false);
 
-// const imageId = ref(null);
-// const nbPieces = ref(null);
 const isLoading = ref(true);
 const hasError = ref(false);
 const errorMessage = ref('');
-
-// const puzzleImage = ref(null);
-const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId', 'duel', 'roomId']);
+const showCountDown = ref(false);
+const countdown = ref(5);
+const isReady = ref(false);
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
 const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage } = usePuzzlePieces(props.imageId, props.nbPieces);
@@ -39,15 +35,13 @@ const pieceStyle = (piece) => ({
     position: 'absolute'
 });
 
-// function loadImage(src) {
-//   return new Promise((resolve, reject) => {
-//     const img = new Image();
-//     img.onload = () => resolve(img);
-//     img.onerror = () => reject(new Error(`Échec du chargement de l'image : ${src}`));
-//     img.src = src;
-//   });
-// }
 function readyToPlay() {
+    isReady.value = true;
+    socketService.readyToPlay(props.roomId);
+}
+
+function changePuzzle() {
+    
     socketService.readyToPlay(props.roomId);
 }
 
@@ -68,20 +62,8 @@ onUnmounted(() => {
 })
 
 onMounted(async () => {
-    //7*7 = 49 pieces
-    // 10*10 = 100 pieces
-    // 15*15 = 225 pieces
-    // 20*20 = 400 pieces
   try {
-    console.log(props)
     initTimer();
-    // imageId.value = parseInt(route.query.imageId, 10);
-    // nbPieces.value = parseInt(route.query.pieces, 10);
-    // const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${imageId.value}`);
-    // const image = await responseImage.json();
-    // puzzleImage.value = image.src;
-    // const response = await fetch(`${import.meta.env.VITE_HOST_API}/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
-    // const puzzleData = await response.json();
     const loadImagePromises = props.puzzleData.map((piece) => {
         return loadImage(piece.fileName, piece);
     });
@@ -107,7 +89,19 @@ onMounted(async () => {
             },
             body: JSON.stringify(pieces.value)
         });
-    } 
+    } else {
+        socketService.onStartCountdown(() => {
+            showCountDown.value = true;
+            const interval = setInterval(() => {
+                countdown.value--;
+                if (countdown.value === 0) {
+                    clearInterval(interval);
+                    showCountDown.value = false;
+                    startTimer();
+                }
+            }, 1000);
+        });
+    }
     isLoading.value = false;
   } catch (error) {
     hasError.value = true;
@@ -131,8 +125,13 @@ onMounted(async () => {
         </div>
         <div class="game-container flex-auto min-w-[900px] m-auto">
             <div class="w-full flex justify-around">
-                <button v-if="props.duel" class="button h-fit" @click="readyToPlay">Prêt</button>
-                <button v-else class="button h-fit" @click="restartGame">Recommencer</button>
+                <div v-if="props.duel === 'oui'">
+                    <button v-if="!isReady && !props.isAdmin" class="button h-fit" @click="readyToPlay">Prêt</button>
+                    <button v-if="props.isAdmin" class="button h-fit" @click="$emit('changePuzzle')">Changer de puzzle</button>
+                </div>
+                <div v-else>
+                    <button class="button h-fit" @click="restartGame">Recommencer</button>
+                </div>
                 <div class="timer">Temps écoulé: {{ formatTime(gameTime) }}</div>
                 <div class="puzzle-preview" @click="enlargeImage">
                     <img :src="props.puzzleImage" alt="Aperçu du puzzle" />
@@ -154,6 +153,7 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
+            <div v-if="showCountDown" class="countdown">{{ countdown }}</div>
             <div v-if="showCompletionAnimation" class="completion-animation">
                 Félicitations ! Puzzle terminé !
             </div>
@@ -268,6 +268,20 @@ onMounted(async () => {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #007bff;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 24px;
+  animation: fadeInOut 3s;
+  z-index: 10;
+}
+.countdown {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: grey;
   color: white;
   padding: 20px;
   border-radius: 10px;

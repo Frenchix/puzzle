@@ -39,14 +39,6 @@ class SocketService {
     onStartCountdown(callback){
         this.socket.on('startCountdown', callback);
     }
-    // socket.on('startCountdown', (data) => {
-    //     // Démarrer un compte à rebours
-    //     startCountdown(data.countdown).then(() => {
-    //         // Commencer la partie
-    //     });
-    // });
-
-    // Vous pouvez ajouter d'autres méthodes selon vos besoins
 }
 
 export default new SocketService();

@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from "firebase/auth";
 import { onAuthStateChanged } from 'firebase/auth'
-import { ref, onValue } from "firebase/database";
-import { getDatabase } from "firebase/database";
+import { ref, onValue, getDatabase, set, onDisconnect } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -36,23 +35,27 @@ export function getCurrentUser() {
   
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        const userStatusRef = ref(db, `users/${user.uid}/status`);
+
         // Référence à l'état de connexion de Firebase
         const connectedRef = ref(db, '.info/connected');
   
         onValue(connectedRef, (snapshot) => {
           if (snapshot.val() === true) {
-            // L'utilisateur est connecté
-            updateUserStatusOnServer(user.uid, 'online');
-            // Configurer l'écouteur pour la déconnexion
-            window.addEventListener('beforeunload', () => updateUserStatusOnServer(user.uid, 'offline'));
+            // L'utilisateur est connecté, mettre à jour le statut en 'online'
+            set(userStatusRef, 'online');
+
+            // Configurer une action à exécuter lorsque l'utilisateur se déconnecte
+            onDisconnect(userStatusRef).set('offline');
           }
         });
+
       }
     });
   }
   
   // Fonction pour envoyer une requête de mise à jour de statut au serveur backend
-  function updateUserStatusOnServer(uid, status) {
+  export function updateUserStatusOnServer(uid, status) {
     fetch(`${import.meta.env.VITE_HOST_API}/updateStatus`, {
       method: 'POST',
       headers: {
@@ -64,8 +67,3 @@ export function getCurrentUser() {
     .then(data => console.log(data))
     .catch(error => console.error('Erreur lors de la mise à jour du statut:', error));
   }
-// used for the databas refs
-// const db = getDatabase(app)
-// export default db
-// here we can export reusable database references
-// export const todosRef = dbRef(db, 'todos')

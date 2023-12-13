@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, updateProfile, deleteUser, signOut, signInWithEmailAndPassword, updatePassword, sendEmailVerification, verifyBeforeUpdateEmail, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider  } from "firebase/auth";
-import { auth } from '../database/firebase'
+import { auth, updateUserStatusOnServer } from '../database/firebase'
 import { useUserStore } from '@/store/user'
+import { storeToRefs } from 'pinia'
 
 export function createUser(email, password, pseudo) {
     return new Promise((resolve, reject) => {
@@ -54,8 +55,11 @@ export function createUser(email, password, pseudo) {
 export function logoutUser(){
     const store = useUserStore();
     const { logout } = store;
+    const { uid } = storeToRefs(store);
+
     return new Promise((resolve, reject) => {
         signOut(auth).then(() => {
+            updateUserStatusOnServer(uid.value, 'offline');
             // Sign-out successful.
             logout();
             resolve();
