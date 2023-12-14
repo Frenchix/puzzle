@@ -24,7 +24,6 @@ onMounted(async () => {
         nbPieces.value = parseInt(route.query.pieces, 10);
         const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${imageId.value}`);
         const image = await responseImage.json();
-       
         puzzleImage.value = image.src;
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/getPieces?id=${imageId.value}&nbPieces=${nbPieces.value}`, { mode: 'cors' });
         puzzleData.value = await response.json();

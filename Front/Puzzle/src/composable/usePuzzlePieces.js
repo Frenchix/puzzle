@@ -3,12 +3,12 @@ import { ref, reactive } from 'vue';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 import { useTimerStore } from '@/store/timer'
-
+import socketService from '../composable/useSocketService';
 
 // const { gameTime, startTimer, stopTimer, timer } = useTimer();
 const showCompletionAnimation = ref(false);
 
-export function usePuzzlePieces(id, nbPieces) {
+export function usePuzzlePieces(id, nbPieces, duel, roomId) {
     const store = useTimerStore();
     const { gameTime } = storeToRefs(store);
     const { stopTimer, startTimer } = store;
@@ -151,11 +151,15 @@ export function usePuzzlePieces(id, nbPieces) {
         if(groups.value[0].pieces.length == nbPieces){
             const store = useUserStore();
             const { userName, bestScore } = storeToRefs(store);
-            stopTimer();
-            triggerCompletionAnimation();
-            if (userName.value){
-                if (bestScore.value === 0 || gameTime.value < bestScore.value){
-                    addScore(userName.value);
+            if(duel === "oui"){
+                socketService.puzzleFinished(roomId, userName.value);
+            } else {
+                stopTimer();
+                triggerCompletionAnimation();
+                if (userName.value){
+                    if (bestScore.value === 0 || gameTime.value < bestScore.value){
+                        addScore(userName.value);
+                    }
                 }
             }
         }
@@ -178,10 +182,10 @@ export function usePuzzlePieces(id, nbPieces) {
 
     function triggerCompletionAnimation() {
         showCompletionAnimation.value = true;
-      
+        
         // Optionnel : Masquer l'animation après un certain temps
         setTimeout(() => {
-          showCompletionAnimation.value = false;
+            showCompletionAnimation.value = false;
         }, 3000); // 3 secondes pour l'affichage de l'animation
       }
       
@@ -225,5 +229,5 @@ export function usePuzzlePieces(id, nbPieces) {
         });
       }
 
-    return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage };
+    return { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage, triggerCompletionAnimation };
 }

@@ -38,6 +38,26 @@ async function getRequestFriend(uid) {
     }
 }
 
+async function getDefi(uid) {
+    try {
+        const ref = db.ref(`defi/${uid}`);
+        const defis = await ref.once('value');
+        return defis.val();
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+}
+
+async function deleteDefi (userName) {
+    try {
+        const ref = db.ref(`defi/${userName}`);
+        await ref.remove();
+    } catch (error) {
+        throw error;
+    }
+}
+
 async function responseFriendRequest(uid, uidFriend, friendName, answer) {
     try {
         let friendsList = []
@@ -126,4 +146,4 @@ async function addFriendRequest(uid, user, friend) {
     }
 }
 
-module.exports = { getFriends, addUser, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus };
+module.exports = { getFriends, addUser, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus, getDefi, deleteDefi };

@@ -1,4 +1,4 @@
-const { getFriends, addUser, getUsername, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus } = require('../model/user');
+const { getFriends, addUser, getUsername, addFriendRequest, getRequestFriend, responseFriendRequest, updateStatus, getDefi, deleteDefi } = require('../model/user');
 
 const userController = {
     getFriends: async (request, response) => {
@@ -54,7 +54,7 @@ const userController = {
             response.status(200).json("Demande d'ami envoyé");
         } catch (error) {
             console.log("error", error)
-            response.status(500).json(error.message);
+            response.status(500).json("L'utilisateur n'existe pas ou une erreur est survenue");
         }
     },
     getUsername: async (request, response) => {
@@ -75,6 +75,25 @@ const userController = {
             response.status(500).json(error.message);
         }
     },
+    getDefi: async (request, response) => {
+        try {
+            const uid = request.params.uid;
+            const data = await getDefi(uid);
+            response.status(200).json(data);
+        } catch (error) {
+            response.status(500).json(error.message);
+        }
+    },
+    deleteDefi: async (request, response) => {
+        try {
+            const userName = request.body.username;
+            await deleteDefi(userName);
+            response.status(200).json("defi deleted");
+        } catch (error) {
+            console.log("error", error)
+            response.status(500).json(error.message);
+        }
+    }
 };
 
 module.exports = userController;

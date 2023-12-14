@@ -16,8 +16,8 @@ class SocketService {
         this.socket.emit('leaveRoom', { roomId, userId });
     }
 
-    puzzleSelected(roomId, imageId, numberPieces) {
-        this.socket.emit('puzzleSelected', roomId, imageId, numberPieces );
+    puzzleSelected(roomId, imageId, numberPieces, puzzleImage) {
+        this.socket.emit('puzzleSelected', roomId, imageId, numberPieces, puzzleImage );
     }
 
     readyToPlay(roomId) {
@@ -26,6 +26,14 @@ class SocketService {
 
     changePuzzle(roomId) {
         this.socket.emit('changePuzzle', roomId );
+    }
+
+    puzzleFinished(roomId, winner) {
+        this.socket.emit('puzzleFinished', roomId, winner );
+    }
+
+    onPuzzleFinished(callback) {
+        this.socket.on('puzzleFinished', callback);
     }
 
     onchangePuzzle(callback) {

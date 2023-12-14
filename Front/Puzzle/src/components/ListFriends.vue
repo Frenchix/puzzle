@@ -10,7 +10,19 @@
                         </div>
                         <div class="w-6 h-6 rounded-[20px]" :class="friend.status == 'online' ? 'bg-green-500' : 'bg-red-500'"></div>
                     </div>
-                    <button class="bg-green-600" @click="launchRoom()">Défier</button>
+                    <button class="bg-green-600" @click="launchRoom(friend.pseudo)">Défier</button>
+                </li>
+            </ul>
+            <ul class="px-2 pt-2">
+                <li v-for="defi, index in defis" class="flex justify-center gap-5 items-center py-2">
+                    <div class="w-1/2 flex gap-5 items-center">
+                        <div>
+                            {{ defi.userName }} souhaite vous défier.
+                        </div>
+                        <!-- <div class="w-6 h-6 rounded-[20px]" :class="friend.status == 'online' ? 'bg-green-500' : 'bg-red-500'"></div> -->
+                    </div>
+                    <button class="bg-green-600" @click="responseDefi(true, index, defi.uuid)">Accepter</button>
+                    <button class="bg-red-600" @click="responseDefi(false, index)">Refuser</button>
                 </li>
             </ul>
         </div>
@@ -50,21 +62,46 @@ const { uid, userName} = storeToRefs(store);
 
 const friends = ref([]);
 const friendsRequest = ref([]);
+const defis = ref([]);
 let uuidRoom = 0;
 
-async function launchRoom() {
+async function responseDefi(response, index, uuid) {
+    try {
+        const requestOptions = {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({username: userName.value})
+            };
+        
+        const response = await fetch(`${import.meta.env.VITE_HOST_API}/defi`, requestOptions);
+        await response.json();
+    } catch (error) {
+        console.log(error)
+        let instance = $toast.error("Un problème est survenu");
+    }
+    delete defis.value[index];
+    if (response){
+        router.push({
+            path: `/room/${uuid}`,
+        });
+    }
+    
+}
+
+async function launchRoom(userNameFriend) {
     try {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ uid: uid.value,
-                                    userName: userName.value
+            body: JSON.stringify({ 
+                                    // uid: uid.value,
+                                    userName: userName.value,
+                                    userNameFriend: userNameFriend
                                 })
             };
         
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/addRoom`, requestOptions);
         uuidRoom = await response.json();
-        // localStorage.setItem('isAdmin', true);
         router.push({
             path: `/room/${uuidRoom}`,
         });
@@ -100,6 +137,8 @@ onMounted(async () => {
     friends.value = await response.json();
     const responseFriendsRequest = await fetch(`${import.meta.env.VITE_HOST_API}/getRequestFriend/${uid.value}`);
     friendsRequest.value = await responseFriendsRequest.json();
+    const responseDefi = await fetch(`${import.meta.env.VITE_HOST_API}/getDefi/${userName.value}`);
+    defis.value = await responseDefi.json();
 });
 
 </script>

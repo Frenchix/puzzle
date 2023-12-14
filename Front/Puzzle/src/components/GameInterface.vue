@@ -7,6 +7,7 @@ import { useTimerStore } from '@/store/timer'
 import { useFormat } from '../composable/useFormat';
 
 const props = defineProps(['puzzleImage', 'puzzleData', 'nbPieces', 'imageId', 'duel', 'roomId', 'isAdmin']);
+const emit = defineEmits(['changePuzzle']);
 
 const store = useTimerStore();
 const { stopTimer, initTimer, startTimer } = store;
@@ -21,9 +22,10 @@ const errorMessage = ref('');
 const showCountDown = ref(false);
 const countdown = ref(5);
 const isReady = ref(false);
+let messagePuzzleFinished = ref('Félicitation, puzzle terminé !!');
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
-const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage } = usePuzzlePieces(props.imageId, props.nbPieces);
+const { pieces, gameTime, showCompletionAnimation, startDrag, onDrag, endDrag, loadImage, triggerCompletionAnimation } = usePuzzlePieces(props.imageId, props.nbPieces, props.duel, props.roomId);
 
 const pieceStyle = (piece) => ({
     left: piece.x + 'px',
@@ -80,7 +82,7 @@ onMounted(async () => {
             attachmentPoint.y *= scaleFactor.value;
         });
     });
-    if (!props.duel) {
+    if (props.duel === "non") {
         fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
             method: 'DELETE',
             headers: {
@@ -108,6 +110,15 @@ onMounted(async () => {
     isLoading.value = false;
     console.error('Erreur lors du chargement des données du puzzle:', error);
   }
+  socketService.onPuzzleFinished((winner) => {
+        messagePuzzleFinished.value = `Le joueur ${winner} vient de finir le puzzle, Bravo!`;
+        stopTimer();
+        triggerCompletionAnimation();
+    });
+    socketService.onchangePuzzle(() => {
+        emit('changePuzzle');
+    });
+    
 });
 
 </script>
@@ -119,7 +130,7 @@ onMounted(async () => {
     <div v-if="hasError" class="text-center text-lg text-red-500">{{ errorMessage }}</div>
 
     <div v-if="!isLoading && !hasError" class="w-full flex flex-col-reverse lg:flex-row">
-        <div v-if="props.imageId && props.nbPieces && !duel" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
+        <div v-if="props.imageId && props.nbPieces && duel ==='non'" class="w-2/12 py-2 max-w-[200px] m-auto lg:m-0">
             <ClassementPuzzle :id="props.imageId" :pieces="props.nbPieces"/>
         </div>
         <div class="game-container flex-auto min-w-[900px] m-auto">
@@ -154,7 +165,7 @@ onMounted(async () => {
             </div>
             <div v-if="showCountDown" class="countdown">{{ countdown }}</div>
             <div v-if="showCompletionAnimation" class="completion-animation">
-                Félicitations ! Puzzle terminé !
+                {{ messagePuzzleFinished }}
             </div>
         </div>
     </div>
@@ -280,12 +291,12 @@ onMounted(async () => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: grey;
+  
   color: white;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-  font-size: 24px;
+  font-size: 86px;
   animation: fadeInOut 3s;
   z-index: 10;
 }

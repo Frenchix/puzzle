@@ -3,9 +3,10 @@ const { addRoom, leaveRoom } = require('../model/room');
 const roomController = {
     addRoom: async (request, response) => {
         try {
-            const uid = request.body.uid;
+            // const uid = request.body.uid;
             const userName = request.body.userName;
-            const uuidRoom = await addRoom(uid, userName);
+            const userNameFriend = request.body.userNameFriend;
+            const uuidRoom = await addRoom(userName, userNameFriend);
             response.status(200).json(uuidRoom);
         } catch (error) {
             console.log("error", error)

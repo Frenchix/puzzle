@@ -36,6 +36,8 @@ router.get('/getUsername/:uid', userController.getUsername);
 router.post('/addUser', userController.addUser);
 router.post('/addFriendRequest', userController.addFriendRequest);
 router.get('/getRequestFriend/:uid', userController.getRequestFriend);
+router.get('/getDefi/:uid', userController.getDefi);
+router.delete('/defi', userController.deleteDefi);
 router.post('/responseFriendRequest', userController.responseFriendRequest);
 router.post('/updateStatus', userController.updateStatus);
 

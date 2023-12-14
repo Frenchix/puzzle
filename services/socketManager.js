@@ -1,5 +1,6 @@
 const { Server } = require('socket.io');
 const PuzzlePiece = require('../model/puzzle');
+const { leaveRoom } = require('../model/room');
 const fs = require('fs');
 
 module.exports = function(server) {
@@ -29,7 +30,6 @@ module.exports = function(server) {
         });
     
         socket.on('disconnect', () => {
-            // console.log("leave")
             for (const roomId in roomsInfo) {
                     const indexOfObject = roomsInfo[roomId]['players'].findIndex(object => {
                         return object.id === socket.id;
@@ -42,6 +42,7 @@ module.exports = function(server) {
                     // Optionnel : supprimer la room si elle est vide
                     if (roomsInfo[roomId]['players'].size === 0) {
                         delete roomsInfo[roomId];
+                        // leaveRoom(roomId);
                     }
             }
         });
@@ -87,7 +88,17 @@ module.exports = function(server) {
         });
 
         socket.on('changePuzzle', (roomId) => {
+            roomsInfo[roomId]['players'].forEach(player => {
+                if (player.isAdmin === false){
+                    player.ready = false;
+                }
+            });
             io.to(roomId).emit('changePuzzle');
+            io.to(roomId).emit('updatePlayerList', roomsInfo[roomId]['players']);
+        });
+
+        socket.on('puzzleFinished', (roomId, winner) => {
+            io.to(roomId).emit('puzzleFinished', winner);
         });
     });
 
