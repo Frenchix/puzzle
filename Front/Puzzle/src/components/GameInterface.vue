@@ -22,6 +22,8 @@ const errorMessage = ref('');
 const showCountDown = ref(false);
 const countdown = ref(5);
 const isReady = ref(false);
+const canDrag = ref(false);
+
 let messagePuzzleFinished = ref('Félicitation, puzzle terminé !!');
 
 const scaleFactor = ref(0.3); // Facteur d'échelle initial
@@ -58,6 +60,11 @@ function closeImageModal() {
   isImageModalOpen.value = false;
 }
 
+function canStartDrag(event, piece) {
+    if (canDrag.value){
+        startDrag(event, piece)
+    }
+}
 onUnmounted(() => {
     stopTimer();
 })
@@ -90,6 +97,7 @@ onMounted(async () => {
             },
             body: JSON.stringify(pieces.value)
         });
+        canDrag.value = true;
     } else {
         socketService.onStartCountdown(() => {
             showCountDown.value = true;
@@ -98,6 +106,7 @@ onMounted(async () => {
                 if (countdown.value === 0) {
                     clearInterval(interval);
                     showCountDown.value = false;
+                    canDrag.value = true
                     startTimer();
                 }
             }, 1000);
@@ -159,7 +168,7 @@ onMounted(async () => {
                         :key="piece.key" 
                         class="puzzle-piece" 
                         :style="pieceStyle(piece)"
-                        @mousedown="event => startDrag(event, piece)">
+                        @mousedown="event => canStartDrag(event, piece)">
                     </div>
                 </div>
             </div>
@@ -292,7 +301,7 @@ onMounted(async () => {
   left: 50%;
   transform: translate(-50%, -50%);
   
-  color: white;
+  color: #007bff;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
