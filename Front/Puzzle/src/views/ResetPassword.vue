@@ -67,6 +67,9 @@ const $toast = useToast();
 const email = ref();
 const showError = ref(false);
 
+
+// i think that you miss some control validation on each field
+
 async function resetPassword() {
     try {
         await resetUserPassword(email.value);

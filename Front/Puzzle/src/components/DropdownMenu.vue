@@ -62,6 +62,7 @@ const { userName } = storeToRefs(store);
 let show = ref(false);
 
 async function clickLogout(){
+   // instance variable can de declared only one time at this position instead of declaring it twice
     try {
        await logoutUser();   
        let instance = $toast.success('Vous êtes bien déconnecté');

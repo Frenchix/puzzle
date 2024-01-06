@@ -19,6 +19,7 @@ const $toast = useToast();
 const pseudo = ref('');
 
 async function sendRequest() {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     try {
         if(userName.value){
             const requestOptions = {

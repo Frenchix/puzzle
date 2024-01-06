@@ -2,6 +2,8 @@
 
 // const app = initializeApp();
 
+// You should use .env instead of parsing a json service account, it will be better to handle services variable and be more secure than storing a plain file
+
 var admin = require("firebase-admin");
 
 var serviceAccount = require("../serviceAccountKey.json");

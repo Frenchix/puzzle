@@ -72,9 +72,11 @@ function selectImage(image) {
 }
 
 async function startGame() {
+     //  throw an error instead of doing a console log :) 
     if (selectedImageId.value && numberOfPieces.value) {
         try {
             isLoading.value = true
+            // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
             const responseImage = await fetch(`${import.meta.env.VITE_HOST_API}/getImage/${selectedImageId.value}`);
             const image = await responseImage.json();
             socketService.puzzleSelected(props.roomId, selectedImageId.value, numberOfPieces.value, image.src);
@@ -87,7 +89,9 @@ async function startGame() {
 }
 
 onMounted(async () => {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     // isAdmin.value = localStorage.getItem('isAdmin');
+    // Put your socketService into you tru ad if its failed the result has to be handled into your catch method
     try {
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/getImages`);
         images.value = await response.json();
