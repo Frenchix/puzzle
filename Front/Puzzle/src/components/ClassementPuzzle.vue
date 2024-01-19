@@ -33,11 +33,14 @@ const props = defineProps({
 })
 
 watchEffect(async () => {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     const response = await fetch(`${import.meta.env.VITE_HOST_API}/getClassement/${props.id - 1}/${props.pieces}`);
     classement.value = await response.json();
 })
 
 onMounted(async () => {
+     // You should handle this in a method and then call it in your onMountedLifecycle 
+     // You can also throw an error instead of doing a console log :) 
     try {
         if(userName.value){
             try {

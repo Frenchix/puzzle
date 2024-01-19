@@ -24,6 +24,7 @@ function startGame() {
 }
 
 onMounted(async () => {
+  // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     try {
         const response = await fetch(`${import.meta.env.VITE_HOST_API}/getImages`);
         images.value = await response.json();
