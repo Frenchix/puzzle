@@ -30,8 +30,8 @@ if(process.env.NODE_ENV !== 'development') {
     
     setupWebSocket(httpsServer);
 
-    httpsServer.listen(5002, () => {
-        console.log('Serveur HTTPS démarré sur le port 5002');
+    httpsServer.listen(process.env.PORT, () => {
+        console.log('Serveur HTTPS démarré sur le port ' + process.env.PORT);
     });
 } else {
     setupWebSocket(server);
