@@ -22,22 +22,27 @@ if(process.env.NODE_ENV !== 'development') {
         res.sendFile('index.html', { root: path.join(__dirname, './public/dist/') });
     });
 
-    const options = {
-        key: fs.readFileSync('./cert/privkey.pem'),
-        cert: fs.readFileSync('./cert/fullchain.pem')
-    };
-    const httpsServer = https.createServer(options, app);
+    // const options = {
+    //     key: fs.readFileSync('./cert/privkey.pem'),
+    //     cert: fs.readFileSync('./cert/fullchain.pem')
+    // };
+    // const httpsServer = https.createServer(options, app);
     
-    setupWebSocket(httpsServer);
+    // setupWebSocket(httpsServer);
 
-    httpsServer.listen(process.env.PORT, () => {
-        console.log('Serveur HTTPS démarré sur le port ' + process.env.PORT);
+    // httpsServer.listen(process.env.PORT, () => {
+    //     console.log('Serveur HTTPS démarré sur le port ' + process.env.PORT);
+    // });
+    setupWebSocket(server);
+
+    server.listen(process.env.PORT, () => {
+        console.log('listening on *:', process.env.PORT);
     });
 } else {
     setupWebSocket(server);
 
-    server.listen(5003, () => {
-        console.log('listening on *:5003');
+    server.listen(process.env.PORT, () => {
+        console.log('listening on *:', process.env.PORT);
     });
 }
 
