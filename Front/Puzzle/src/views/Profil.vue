@@ -159,6 +159,8 @@ const passwordMail = ref();
 const newPassword = ref();
 const showError = ref(false);
 
+// i think that you miss some control validation on each field
+
 async function editPseudo() {
     try {
         await updateUser(userName);

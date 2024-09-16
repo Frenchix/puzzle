@@ -100,6 +100,9 @@ const password = ref()
 const pseudo = ref()
 const showError = ref(false)
 
+
+// i think that you miss some control validation on each field
+
 async function signup() {
     try {
         await createUser(email.value, password.value, pseudo.value);

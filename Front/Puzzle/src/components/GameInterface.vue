@@ -89,7 +89,9 @@ onMounted(async () => {
             attachmentPoint.y *= scaleFactor.value;
         });
     });
+    // Handle boolean instead of string "non" :) 
     if (props.duel === "non") {
+      // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
         fetch((`${import.meta.env.VITE_HOST_API}/deleteFiles`), {
             method: 'DELETE',
             headers: {

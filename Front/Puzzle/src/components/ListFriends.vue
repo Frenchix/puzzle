@@ -67,6 +67,7 @@ let uuidRoom = 0;
 
 async function responseDefi(response, index, uuid) {
     try {
+        // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
         const requestOptions = {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -89,6 +90,7 @@ async function responseDefi(response, index, uuid) {
 }
 
 async function launchRoom(userNameFriend) {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     try {
         const requestOptions = {
             method: "POST",
@@ -111,6 +113,7 @@ async function launchRoom(userNameFriend) {
 }
 
 async function responseFriendRequest(answer, index, uidFriend) {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     try {
         const requestOptions = {
             method: "POST",
@@ -133,6 +136,7 @@ async function responseFriendRequest(answer, index, uidFriend) {
 }
 
 onMounted(async () => {
+    // You should create a service layer file that handle all of your fetch() for better readability and to avoid code repetition
     const response = await fetch(`${import.meta.env.VITE_HOST_API}/getFriends/${uid.value}`);
     friends.value = await response.json();
     const responseFriendsRequest = await fetch(`${import.meta.env.VITE_HOST_API}/getRequestFriend/${uid.value}`);
